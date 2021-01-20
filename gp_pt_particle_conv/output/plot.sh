@@ -5,12 +5,14 @@
 gnuplot -p -e "
 	set size 0.75,0.75;
 	set key at graph 0.9,0.90;
-	set key box;
 	set format y '%.3e';
-	set grid;
 
-	set xlabel 'Basis size (a.\,u.)';
+	set xlabel '\$\\lambda\$';
 	set ylabel 'Energy (a.\,u.)';
 	plot
-		'out_32' u 1:4 	w linespoints lw 2 title '2',
+		'out' u 1:3 w linespoints lw 2 title 'Ebmf',
+		'out' u 1:4 w linespoints lw 2 title 'rs2',
+		'out' u 1:5 w linespoints lw 2 title 'rs3',
+		'out' u 1:6 w linespoints lw 2 title 'en2',
+		'out' u 1:7 w linespoints lw 2 title 'en3';
 "

@@ -1,12 +1,9 @@
 #include <sbmf/sbmf.h>
-
-#include <plot/plot.h>
-
 #include <stdio.h>
 
 #define NA 4
 
-#define ORDER (1e5)
+#define ORDER (10.0)
 
 #define GAA (1.0/ORDER)
 
@@ -18,7 +15,6 @@ static i64 occupations[] = {NA};
 
 //#define PERTURBATION(x) 2*gaussian(x, 0, 0.2)
 #define PERTURBATION(x) 0.0
-//#define PERTURBATION(x) (-1.5015*sqrt(x*x - 1.5*1.5 + 1.5015*1.5015));
 
 void perturbation(const u32 len, f64 out[static len],
                                 f64 in_x[static len], const u32 component_count,
@@ -67,7 +63,8 @@ int main() {
 
 	//u32 bs[] = {4,8,12,16,24,32,48,64};
 	//u32 os[] = {5,10,50,100,200,300,400,500,600,700,800,900,1000};
-	i64 os[] = {ORDER, 2*ORDER, 3*ORDER, 4*ORDER , 5*ORDER, 6*ORDER, 7*ORDER, 8*ORDER, 9*ORDER};
+	//i64 os[] = {ORDER, 2*ORDER, 3*ORDER, 4*ORDER , 5*ORDER, 6*ORDER, 7*ORDER, 8*ORDER, 9*ORDER};
+	i64 os[] = {1*ORDER, 2*ORDER, 3*ORDER, 4*ORDER, 5*ORDER};
 	//i64 os[] = {9*ORDER};
 	struct nlse_settings settings = {
         .spatial_pot_perturbation = perturbation,
@@ -75,10 +72,10 @@ int main() {
 		.max_integration_evals = 1e5,
 		.error_tol = 1e-10,
 
-        .num_basis_funcs = 64,
+        .num_basis_funcs = 16,
 		.basis = ho_basis,
 
-		.hamiltonian_mixing = 0.6,
+		.hamiltonian_mixing = 0.4,
 
 		.zero_threshold = 1e-10,
 		.gk=gk15
@@ -91,27 +88,30 @@ int main() {
 		occupations[0] = o;
 
 		sbmf_init();
-		struct nlse_result res = grosspitaevskii(settings, component_count, occupations, guesses, g0);
-		f64 Egp = full_energy(settings, res.coeff_count, component_count, res.coeff, occupations, g0);
 
-		//struct pt_result ptres = rayleigh_schroedinger_pt_rf(res, 0, g0, occupations);
-		struct pt_result ptres = en_pt_rf(res, 0, g0, occupations);
-		//printf("E0:          %.15lf\n", ptres.E0);
-		//printf("E1:          %.15lf\n", ptres.E1);
-		//printf("E2:          %.15lf\n", ptres.E2);
-		//printf("E3:          %.15lf\n", ptres.E3);
-		//printf("E0+E1:       %.15lf\n", ptres.E0+ptres.E1);
-		//printf("E0+E1+E2:    %.15lf\n", ptres.E0+ptres.E1+ptres.E2);
-		//printf("E0+E1+E2+E3: %.15lf\n", ptres.E0+ptres.E1+ptres.E2+ptres.E3);
+		/* GP */
+		struct nlse_result gp_res = grosspitaevskii(settings, component_count, occupations, guesses, g0);
+		f64 Egp = full_energy(settings, gp_res.coeff_count, component_count, gp_res.coeff, occupations, g0);
+
+		/* BestMF */
+		struct bestmf_result bmf_res = best_meanfield(settings, occupations[0], g0[0], guesses);
+
+		/* RSPT */
+		struct pt_result rs_res = rayleigh_schroedinger_pt_rf(gp_res, 0, g0, occupations);
+
+		/* ENPT */
+		struct pt_result en_res = en_pt_rf(gp_res, 0, g0, occupations);
 
 		{
 			FILE* fd = fopen("out", "a");
-			f64 Ept = ptres.E0+ptres.E1+ptres.E2+ptres.E3;
-			fprintf(fd, "%u\t%.10e\t%.10e\t%.10e\n",
-					o,
-					Egp/(f64)o,
-					Ept/(f64)o,
-					(Egp - Ept)/(f64)o
+			fprintf(fd, "%lf\t%.10e\t%.10e\t%.10e\t%.10e\t%.10e\t%.10e\n",
+					GAA*(o-1),
+					(Egp),
+					(Egp - bmf_res.energy),
+					Egp - (rs_res.E0 + rs_res.E1 + rs_res.E2),
+					Egp - (rs_res.E0 + rs_res.E1 + rs_res.E2 + rs_res.E3),
+					Egp - (en_res.E0 + en_res.E1 + en_res.E2),
+					Egp - (en_res.E0 + en_res.E1 + en_res.E2 + en_res.E3)
 					);
 			fclose(fd);
 		}

@@ -1,16 +1,21 @@
 #include <sbmf/sbmf.h>
+
 #include <stdio.h>
 
 #define NA 4
-#define NB 4
+#define NB 0
 
 //#define GAA (1.0/1e5)
 //#define GAA (-4.0)
 //#define GAA (-10.0/(NA-1))
+//#define GAA (0.5/(NA-1))
 #define GAA (1.0/3.0)
-#define GAB (0.5)
-#define GBA (0.5)
+#define GAB (0)
+#define GBA (0)
 #define GBB (0)
+//#define GAB (-1.0/(NB))
+//#define GBA (-1.0/(NA))
+//#define GBB (0.5/(NB-1))
 
 #define USE_TF_GUESS 0
 #define USE_GAUSSIAN_GUESS 0
@@ -28,11 +33,6 @@ void perturbation(const u32 len, f64 out[static len],
         out[i] = PERTURBATION(in_x[i]);
     }
 }
-
-
-
-
-
 
 
 
@@ -125,14 +125,21 @@ int main() {
 		.max_integration_evals = 1e5,
 		.error_tol = 1e-10,
 
-        .num_basis_funcs = 64,
+        .num_basis_funcs = 50,
 		.basis = ho_basis,
 
 		.zero_threshold = 1e-10,
+		.orbital_mixing = 0.0,
 		.hamiltonian_mixing = 0.0,
+		.mix_until_iteration = 0,
+		.diis_log_length = 4,
+		.diis_enabled = false,
 
-		.debug_callback = debug_callback,
-		.measure_every = 0,
+		.orbital_choice = NLSE_ORBITAL_LOWEST_ENERGY,
+		//.orbital_choice = NLSE_ORBITAL_MAXIMUM_OVERLAP,
+		.mom_orbitals_to_consider = 8,
+		.mom_enable_at_iteration = 0,
+
 		.gk=gk15
     };
 
@@ -143,75 +150,13 @@ int main() {
 	printf("\nfull energy: %lf\n", Efull);
 	printf("\nfull energy per particle: %lf\n", Efull/((f64)NA+(f64)NB));
 
+
 	nlse_write_to_binary_file("outbin", res);
-
-#if 0
-	{
-		const u32 N = 256;
-		plot_init(800, 600, "gp2c");
-		f32 potdata[N], adata[N], bdata[N];
-		sample_space sp = make_linspace(1, -5, 5, N);
-
-		for (u32 i = 0; i < N; ++i) {
-			f64 x = sp.points[i];
-			potdata[i] = (f32) ho_potential(&x,1,0) + PERTURBATION(x);
-		}
-		push_line_plot(&(plot_push_desc){
-				.space = &sp,
-				.data = potdata,
-				.label = "potential",
-				});
-
-
-		f64 sample_in[N];
-		for (u32 i = 0; i < N; ++i) {
-			sample_in[i] = (f64) sp.points[i];
-		}
-
-		for (u32 i = 0; i < res.component_count; ++i) {
-			f64 sample_out[N];
-			ho_sample(res.coeff_count, &res.coeff[i*res.coeff_count], N, sample_out, sample_in);
-
-			f32 data[N];
-			for (u32 k = 0; k < N; ++k) {
-				data[k] = fabs(sample_out[k])*fabs(sample_out[k]);
-			}
-			push_line_plot(&(plot_push_desc){
-					.space = &sp,
-					.data = data,
-					.label = plot_snprintf("comp: %u", i),
-					.offset = res.energy[i],
-					});
-		}
-
-		{
-			FILE* fd = fopen("output/outplotdata", "w");
-			f64 sample[N*res.component_count];
-			for (u32 i = 0; i < res.component_count; ++i) {
-				f64 sample_out[N];
-				ho_sample(res.coeff_count, &res.coeff[i*res.coeff_count], N, &sample[i*N], sample_in);
-			}
-
-			for (u32 i = 0; i < N; ++i) {
-				fprintf(fd, "%lf\t", sample_in[i]);
-				for (u32 j = 0; j < res.component_count; ++j) {
-					f64 c = fabs(sample[j*N + i]);
-					fprintf(fd, "%lf\t", c*c);
-				}
-				fprintf(fd, "\n");
-			}
-
-			fclose(fd);
-		}
-
-		plot_update_until_closed();
-		plot_shutdown();
-	}
-#endif
 
 #if 1
 	{
-		struct pt_result ptres = rayleigh_schroedinger_pt_rf_2comp(res, g0, occupations);
+		struct pt_result ptres = rayleigh_schroedinger_pt_rf(res, 0, g0, occupations);
+		//struct pt_result ptres = rayleigh_schroedinger_pt_rf_2comp(res, g0, occupations);
 		printf("E0:          %.15lf\n", ptres.E0);
 		printf("E1:          %.15lf\n", ptres.E1);
 		printf("E2:          %.15lf\n", ptres.E2);
