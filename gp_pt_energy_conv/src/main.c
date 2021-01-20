@@ -129,9 +129,10 @@ int main() {
 
 		{
 			FILE* fd = fopen("out", "a");
-			fprintf(fd, "%u\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n",
+			fprintf(fd, "%u\t%lf\t%lf\t%lf\n",
 					b,
-					Egp, ptres.E0, ptres.E1, ptres.E2, ptres.E3,
+					Egp,
+					ptres.E0+ptres.E1+ptres.E2,
 					ptres.E0+ptres.E1+ptres.E2+ptres.E3);
 			fclose(fd);
 		}

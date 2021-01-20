@@ -155,7 +155,7 @@ int main() {
 
 #if 1
 	{
-		struct pt_result ptres = rayleigh_schroedinger_pt_rf(res, 0, g0, occupations);
+		struct pt_result ptres = rayleigh_schroedinger_pt(res, 0, g0, occupations);
 		//struct pt_result ptres = rayleigh_schroedinger_pt_rf_2comp(res, g0, occupations);
 		printf("E0:          %.15lf\n", ptres.E0);
 		printf("E1:          %.15lf\n", ptres.E1);
