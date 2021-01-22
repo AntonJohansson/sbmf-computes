@@ -1,7 +1,5 @@
 #include <sbmf/sbmf.h>
 
-#include <plot/plot.h>
-
 #include <stdio.h>
 
 #define NA 4
@@ -93,51 +91,63 @@ int main() {
 
 	i64 occupations[] = {NA,NB};
 
+	f64 g0s[] = {-1.0/6.0, -1.0/3.0, 1.0/3.0, 1.0/6.0};
 	u32 bs[] = {4,8,12,16,24,32,48,64};
 	struct nlse_settings settings = {
-        .spatial_pot_perturbation = perturbation,
+        //.spatial_pot_perturbation = perturbation,
 		.max_iterations = 1e5,
 		.max_integration_evals = 1e5,
-		.error_tol = 1e-9,
+		.error_tol = 1e-15,
 
         .num_basis_funcs = 16,
 		.basis = ho_basis,
 
 		.zero_threshold = 1e-10,
-		.gk=gk15
+		.gk=gk20
     };
 
 	const u32 component_count = 1;
 
-	for (u32 i = 0; i < sizeof(bs)/sizeof(bs[0]); ++i) {
-		u32 b = bs[i];
-		settings.num_basis_funcs = b;
+	for (u32 j = 0; j < sizeof(g0s)/sizeof(g0s[0]); ++j) {
+		g0[0] = g0s[j];
 
-		sbmf_init();
-		struct nlse_result res = grosspitaevskii(settings, component_count, occupations, guesses, g0);
-		f64 Egp = full_energy(settings, res.coeff_count, component_count, res.coeff, occupations, g0);
+		for (u32 i = 0; i < sizeof(bs)/sizeof(bs[0]); ++i) {
+			u32 b = bs[i];
+			settings.num_basis_funcs = b;
 
-		//struct pt_result ptres = rayleigh_schroedinger_pt_rf(res, 0, g0, occupations);
-		struct pt_result ptres = en_pt_rf(res, 0, g0, occupations);
-		printf("E0:          %.15lf\n", ptres.E0);
-		printf("E1:          %.15lf\n", ptres.E1);
-		printf("E2:          %.15lf\n", ptres.E2);
-		printf("E3:          %.15lf\n", ptres.E3);
-		printf("E0+E1:       %.15lf\n", ptres.E0+ptres.E1);
-		printf("E0+E1+E2:    %.15lf\n", ptres.E0+ptres.E1+ptres.E2);
-		printf("E0+E1+E2+E3: %.15lf\n", ptres.E0+ptres.E1+ptres.E2+ptres.E3);
+			sbmf_init();
+			struct nlse_result res = grosspitaevskii(settings, component_count, occupations, guesses, g0);
+			f64 Egp = full_energy(settings, res.coeff_count, component_count, res.coeff, occupations, g0);
 
-		{
-			FILE* fd = fopen("out", "a");
-			fprintf(fd, "%u\t%lf\t%lf\t%lf\n",
-					b,
-					Egp,
-					ptres.E0+ptres.E1+ptres.E2,
-					ptres.E0+ptres.E1+ptres.E2+ptres.E3);
-			fclose(fd);
+			struct pt_result rs_ptres = rayleigh_schroedinger_pt_rf(settings, res, 0, g0, occupations);
+			struct pt_result en_ptres = en_pt_rf(settings, res, 0, g0, occupations);
+
+			//printf("E0:          %.15lf\n", ptres.E0);
+			//printf("E1:          %.15lf\n", ptres.E1);
+			//printf("E2:          %.15lf\n", ptres.E2);
+			//printf("E3:          %.15lf\n", ptres.E3);
+			//printf("E0+E1:       %.15lf\n", ptres.E0+ptres.E1);
+			//printf("E0+E1+E2:    %.15lf\n", ptres.E0+ptres.E1+ptres.E2);
+			//printf("E0+E1+E2+E3: %.15lf\n", ptres.E0+ptres.E1+ptres.E2+ptres.E3);
+
+			{
+				char buf[256];
+				snprintf(buf, 256, "out_g%.2lf", g0[0]);
+
+				FILE* fd = fopen(buf, "a");
+				fprintf(fd, "%u\t%.10lf\t%.10lf\t%.10lf\t%.10lf\t%.10lf\n",
+						b,
+						Egp,
+						rs_ptres.E0+rs_ptres.E1+rs_ptres.E2,
+						rs_ptres.E0+rs_ptres.E1+rs_ptres.E2+rs_ptres.E3,
+						en_ptres.E0+en_ptres.E1+en_ptres.E2,
+						en_ptres.E0+en_ptres.E1+en_ptres.E2+en_ptres.E3
+					   );
+				fclose(fd);
+			}
+
+			sbmf_shutdown();
 		}
-
-		sbmf_shutdown();
 	}
 
 }
