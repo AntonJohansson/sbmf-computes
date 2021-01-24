@@ -117,7 +117,7 @@ int main() {
 				snprintf(buf, 256, "out_g%.2lf", l0s[j]);
 
 				FILE* fd = fopen(buf, "a");
-				fprintf(fd, "%u\t%.10lf\t%.10f\t%.10f\t%.10lf\t%.10lf\t%.10lf\t%.10lf\n",
+				fprintf(fd, "%ld\t%.10lf\t%.10f\t%.10f\t%.10lf\t%.10lf\t%.10lf\t%.10lf\n",
 						N,
 						Egp,
 						bmf_gaussian_res.energy								- Egp,
