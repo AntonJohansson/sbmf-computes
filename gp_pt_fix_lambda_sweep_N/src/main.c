@@ -73,7 +73,6 @@ int main() {
 	struct nlse_guess* default_guesses = NULL;
 
 	f64 l0s[] = {-0.5, -1.0, 1.0, 0.5};
-	f64 g0s[] = {-1.0/6.0, -1.0/3.0, 1.0/3.0, 1.0/6.0};
 	struct nlse_settings settings = {
         //.spatial_pot_perturbation = perturbation,
 		.max_iterations = 1e5,
