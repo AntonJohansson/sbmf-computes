@@ -72,16 +72,17 @@ int main() {
 	};
 	struct nlse_guess* default_guesses = NULL;
 
-	//f64 l0s[] = {-0.5, -1.0, 1.0, 0.5};
-	f64 l0s[] = {0.005};
-	i64 range_N[] = {100, 500, 15000};
+	f64 l0s[] = {-0.5, -1.0, 1.0, 0.5};
+	//f64 l0s[] = {};
+	//i64 range_N[] = {100, 500, 15000};
+	i64 Ns[] = {10, 100, 1000, 100000, 1000000};
 	struct nlse_settings settings = {
         //.spatial_pot_perturbation = perturbation,
 		.max_iterations = 1e5,
 		.max_integration_evals = 1e5,
 		.error_tol = 1e-14,
 
-        .num_basis_funcs = 16,
+        .num_basis_funcs = 32,
 		.basis = ho_basis,
 
 		.zero_threshold = 1e-10,
@@ -97,19 +98,20 @@ int main() {
 		struct bestmf_result bmf_gaussian_res;
 		struct bestmf_result bmf_default_res;
 
-
 		{
 			i64 N = 4;
 			f64 g0 = l0s[j]/((f64)N-1.0);
 			res = grosspitaevskii(settings, component_count, &N, default_guesses, &g0);
-			bmf_gaussian_res = best_meanfield(settings, N, g0, gaussian_guesses);
- 			bmf_default_res = best_meanfield(settings, N, g0, default_guesses);
 		}
 
-		for (i64 N = range_N[0]; N < range_N[2]; N += range_N[1]) {
+		for (u32 k = 0; k < sizeof(Ns)/sizeof(Ns[0]); ++k) {
+			i64 N = Ns[k];
 			f64 g0 = l0s[j]/((f64)N-1.0);
 
-			f64 Egp = full_energy(settings, res.coeff_count, component_count, res.coeff, &N, &g0);
+			f64 Egp = grosspitaevskii_energy(settings, res.coeff_count, component_count, res.coeff, &N, &g0);
+
+			bmf_gaussian_res = best_meanfield(settings, N, g0, gaussian_guesses);
+ 			bmf_default_res = best_meanfield(settings, N, g0, default_guesses);
 
 			struct pt_result rs_ptres = rayleigh_schroedinger_pt_rf(settings, res, 0, &g0, &N);
 			struct pt_result en_ptres = en_pt_rf(settings, res, 0, &g0, &N);
