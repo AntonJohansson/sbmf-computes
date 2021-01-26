@@ -123,7 +123,7 @@ int main() {
         .spatial_pot_perturbation = perturbation,
 		.max_iterations = 1e5,
 		.max_integration_evals = 1e5,
-		.error_tol = 1e-10,
+		.error_tol = 1e-14,
 
         .num_basis_funcs = 50,
 		.basis = ho_basis,
@@ -140,22 +140,21 @@ int main() {
 		.mom_orbitals_to_consider = 8,
 		.mom_enable_at_iteration = 0,
 
-		.gk=gk15
+		.gk=gk20
     };
 
 	const u32 component_count = COMPONENT_COUNT;
 
 	struct nlse_result res = grosspitaevskii(settings, component_count, occupations, guesses, g0);
-	f64 Efull = full_energy(settings, res.coeff_count, component_count, res.coeff, occupations, g0);
+	f64 Efull = grosspitaevskii_energy(settings, res.coeff_count, component_count, res.coeff, occupations, g0);
 	printf("\nfull energy: %lf\n", Efull);
 	printf("\nfull energy per particle: %lf\n", Efull/((f64)NA+(f64)NB));
 
-
-	nlse_write_to_binary_file("outbin", res);
+	//nlse_write_to_binary_file("outbin", res);
 
 #if 1
 	{
-		struct pt_result ptres = rayleigh_schroedinger_pt(res, 0, g0, occupations);
+		struct pt_result ptres = rayleigh_schroedinger_pt_rf(settings, res, 0, g0, occupations);
 		//struct pt_result ptres = rayleigh_schroedinger_pt_rf_2comp(res, g0, occupations);
 		printf("E0:          %.15lf\n", ptres.E0);
 		printf("E1:          %.15lf\n", ptres.E1);
@@ -164,9 +163,7 @@ int main() {
 		printf("E0+E1:       %.15lf\n", ptres.E0+ptres.E1);
 		printf("E0+E1+E2:    %.15lf\n", ptres.E0+ptres.E1+ptres.E2);
 		printf("E0+E1+E2+E3: %.15lf\n", ptres.E0+ptres.E1+ptres.E2+ptres.E3);
-
-		printf("E0+E1+E2+E3: %.15lf\n", (ptres.E0+ptres.E1+ptres.E2+ptres.E3)/(f64)NA);
-		printf("diff: %.15lf\n", Efull/NA - (ptres.E0+ptres.E1+ptres.E2+ptres.E3)/(f64)NA);
+		printf("diff: %.15lf\n", Efull - (ptres.E0+ptres.E1+ptres.E2+ptres.E3));
 	}
 #endif
 

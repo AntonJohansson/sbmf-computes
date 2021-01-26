@@ -31,7 +31,7 @@ int main() {
 	};
 	struct nlse_guess* default_guesses = NULL;
 
-	f64 g0 = 1.0/3.0;
+	f64 g0 = 4.0/3.0;
 	i64 N  = 4;
 
 	struct nlse_settings settings = {
@@ -40,8 +40,9 @@ int main() {
 		.max_integration_evals = 1e5,
 		.error_tol = 1e-14,
 
-        .num_basis_funcs = 64,
+        .num_basis_funcs = 16,
 		.basis = ho_basis,
+		.hamiltonian_mixing = 0.5,
 
 		.zero_threshold = 1e-10,
 
