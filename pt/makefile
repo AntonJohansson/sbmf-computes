@@ -14,4 +14,4 @@ DEBUG_FLAGS = -g \
 RELEASE_FLAGS = -O3
 
 $(PROJECT): $(SRCS)
-	$(CC) -o $(PROJECT) $(SRCS) -O3 -L../ -I../ -l:sbmf.a -lm -lpthread -fopenmp -lgfortran
+	$(CC) -o $(PROJECT) $(SRCS) $(RELEASE_FLAGS) -L../ -I../ -l:sbmf.a -lm -lpthread -fopenmp -lgfortran
