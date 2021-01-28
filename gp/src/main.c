@@ -3,23 +3,23 @@
 #include <stdio.h>
 
 #define NA 4
-#define NB 0
+#define NB 4
 
 //#define GAA (1.0/1e5)
 //#define GAA (-4.0)
 //#define GAA (-10.0/(NA-1))
 //#define GAA (0.5/(NA-1))
 #define GAA (1.0/3.0)
-#define GAB (0)
-#define GBA (0)
-#define GBB (0)
+#define GAB (-1.0/6.0)
+#define GBA (-1.0/6.0)
+#define GBB (1.0/3.0)
 //#define GAB (-1.0/(NB))
 //#define GBA (-1.0/(NA))
 //#define GBB (0.5/(NB-1))
 
 #define USE_TF_GUESS 0
 #define USE_GAUSSIAN_GUESS 0
-#define COMPONENT_COUNT 1
+#define COMPONENT_COUNT 2
 
 //#define PERTURBATION(x) 2*gaussian(x, 0, 0.2)
 #define PERTURBATION(x) 0.0
@@ -132,8 +132,6 @@ int main() {
 		.orbital_mixing = 0.0,
 		.hamiltonian_mixing = 0.0,
 		.mix_until_iteration = 0,
-		.diis_log_length = 4,
-		.diis_enabled = false,
 
 		.orbital_choice = NLSE_ORBITAL_LOWEST_ENERGY,
 		//.orbital_choice = NLSE_ORBITAL_MAXIMUM_OVERLAP,
@@ -148,11 +146,10 @@ int main() {
 	struct nlse_result res = grosspitaevskii(settings, component_count, occupations, guesses, g0);
 	f64 Efull = grosspitaevskii_energy(settings, res.coeff_count, component_count, res.coeff, occupations, g0);
 	printf("\nfull energy: %lf\n", Efull);
-	printf("\nfull energy per particle: %lf\n", Efull/((f64)NA+(f64)NB));
 
-	//nlse_write_to_binary_file("outbin", res);
+	nlse_write_to_binary_file("outbin", res);
 
-#if 1
+#if 0
 	{
 		struct pt_result ptres = rayleigh_schroedinger_pt_rf(settings, res, 0, g0, occupations);
 		//struct pt_result ptres = rayleigh_schroedinger_pt_rf_2comp(res, g0, occupations);
