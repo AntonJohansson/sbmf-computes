@@ -28,12 +28,9 @@ int main() {
 
 	cudaMemcpy(da, a, N*sizeof(float), cudaMemcpyHostToDevice);
 	cudaMemcpy(db, b, N*sizeof(float), cudaMemcpyHostToDevice);
-	cudaMemcpy(dc, c, N*sizeof(float), cudaMemcpyHostToDevice);
 
 	add<<<1,1>>>(dc,db,da,N);
 
-	cudaMemcpy(a, da, N*sizeof(float), cudaMemcpyDeviceToHost);
-	cudaMemcpy(b, db, N*sizeof(float), cudaMemcpyDeviceToHost);
 	cudaMemcpy(c, dc, N*sizeof(float), cudaMemcpyDeviceToHost);
 
 	for (unsigned int i = 0; i < N; ++i) {

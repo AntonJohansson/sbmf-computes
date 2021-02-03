@@ -140,25 +140,24 @@ struct quadgk_settings {
 	f64 abs_error_tol;
 	f64 rel_error_tol;
 
-	/*
-	 * The maximum allowed function evaluations of
-	 * the supplied integrand.
-	 */
-	i32 max_evals;
+	/* Maximum allowed iterations */
+	u32 max_iters;
 
+	/* Pointer passed to the function to be integrated */
 	void* userdata;
 };
 
 struct quadgk_result {
 	f64 integral;
 	f64 error;
-	i32 performed_evals;
+	//i32 performed_evals;
+	u32 performed_iters;
 	bool converged;
 };
 
 typedef void integrand_func(f64*,f64*,u32,void*);
 
-void quadgk_infinite_interval(integrand_func* f, const struct quadgk_settings* settings, struct quadgk_result* res);
+void quadgk_infinite_interval(integrand_func* f, const struct quadgk_settings* settings, void* memory, struct quadgk_result* res);
 
 /*
  * Basis
