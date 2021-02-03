@@ -4,10 +4,14 @@
 #define N 100000000
 
 __global__ void add(float* c, float* a, float* b, unsigned int n) {
-	for (unsigned int i = 0; i < n; ++i) {
-		c[i] = a[i] + b[i];
-	}
+	unsigned int i = threadIdx.x;
+	unsigned int stride = blockDim.x;
+
+	unsigned int tid = blockIdx.x*blockDim.x + threadIdx.x;
+	if (tid < n)
+		c[tid] = a[tid] + b[tid];
 }
+
 
 int main() {
 	float* a = (float*)malloc(N*sizeof(float));
@@ -29,7 +33,7 @@ int main() {
 	cudaMemcpy(da, a, N*sizeof(float), cudaMemcpyHostToDevice);
 	cudaMemcpy(db, b, N*sizeof(float), cudaMemcpyHostToDevice);
 
-	add<<<1,1>>>(dc,db,da,N);
+	add<<<N/256,256>>>(dc,db,da,N);
 
 	cudaMemcpy(c, dc, N*sizeof(float), cudaMemcpyDeviceToHost);
 

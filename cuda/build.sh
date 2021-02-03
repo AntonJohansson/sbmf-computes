@@ -1,4 +1,6 @@
 #!/bin/sh
 
+CUDADIR=/opt/cuda/
+
 gcc -o sum sum.c
-/opt/cuda/bin/nvcc -o sumcu sum.cu -I /opt/cuda/include
+${CUDADIR}/bin/nvcc -o sumcu sum.cu -I ${CUDADIR}/include
