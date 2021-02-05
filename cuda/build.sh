@@ -3,4 +3,4 @@
 CUDADIR=/opt/cuda/
 
 gcc -o sum sum.c
-${CUDADIR}/bin/nvcc -o sumcu sum.cu -I ${CUDADIR}/include
+${CUDADIR}/bin/nvcc -c -Xcompiler -c -o sumcu.o sum.cu -I ${CUDADIR}/include
