@@ -122,7 +122,7 @@ int main() {
 	struct nlse_settings settings = {
         .spatial_pot_perturbation = perturbation,
 		.max_iterations = 1e5,
-		.max_integration_evals = 1e5,
+		.max_quadgk_iters = 500,
 		.error_tol = 1e-14,
 
         .num_basis_funcs = 50,
@@ -149,10 +149,11 @@ int main() {
 
 	nlse_write_to_binary_file("outbin", res);
 
-#if 0
+#if 1
 	{
-		struct pt_result ptres = rayleigh_schroedinger_pt_rf(settings, res, 0, g0, occupations);
+		//struct pt_result ptres = rayleigh_schroedinger_pt_rf(settings, res, 0, g0, occupations);
 		//struct pt_result ptres = rayleigh_schroedinger_pt_rf_2comp(res, g0, occupations);
+		struct pt_result ptres = en_pt_2comp(settings, res, g0, occupations);
 		printf("E0:          %.15lf\n", ptres.E0);
 		printf("E1:          %.15lf\n", ptres.E1);
 		printf("E2:          %.15lf\n", ptres.E2);
