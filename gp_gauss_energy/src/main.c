@@ -19,7 +19,6 @@ void log_callback(enum sbmf_log_level log_level, const char* msg) {
 
 int main() {
 	sbmf_set_log_callback(log_callback);
-	sbmf_init();
 
 	struct nlse_guess random_guesses[] = {
 		[0] = {
@@ -37,7 +36,7 @@ int main() {
 		.max_quadgk_iters = 500,
 		.error_tol = 1e-14,
 
-        .num_basis_funcs = 16,
+        .num_basis_funcs = 48,
 		.basis = ho_basis,
 		.hamiltonian_mixing = 0.5,
 
@@ -58,6 +57,8 @@ int main() {
 	fprintf(random_fd, "#N\tmu\tE\tBMF\tRS2\tRS3\tEN2\tEN3\n");
 
 	for (u32 i = 0; i < sizeof(Ns)/sizeof(Ns[0]); ++i) {
+		sbmf_init();
+
 		i64 N = Ns[i];
 		f64 g0 = lambda/((f64)N-1.0);
 
@@ -100,9 +101,9 @@ int main() {
 					en_random_ptres.E0 + en_random_ptres.E1 + en_random_ptres.E2 + en_random_ptres.E3
 				   );
 		}
+
+		sbmf_shutdown();
 	}
 	fclose(default_fd);
 	fclose(random_fd);
-
-	sbmf_shutdown();
 }
