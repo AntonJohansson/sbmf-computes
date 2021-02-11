@@ -6,8 +6,11 @@
 #define USE_GAUSSIAN_GUESS 0
 #define USE_RANDOM_GUESS 1
 
-#include <plot/plot.h>
+#define PLOT 0
 
+#if PLOT
+	#include <plot/plot.h>
+#endif
 
 
 
@@ -68,7 +71,7 @@ int main() {
 
 	struct nlse_settings settings = {
 		.max_iterations = 1e5,
-		.max_integration_evals = 1e5,
+		.max_quadgk_iters = 500,
 		.error_tol = 1e-14,
 
         .num_basis_funcs = 16,
@@ -85,46 +88,40 @@ int main() {
 
 	OMEGA = 0.01;
 
-	const u32 N = 400;
-
 	const u32 component_count = 2;
-	i64 occupations[] = {N,N};
-	f64 g0[] = {
-		 0.5/((f64)N-1), -0.5/((f64)N-1),
-		-0.5/((f64)N-1),  0.5/((f64)N-1)
-	};
 
-	struct nlse_result res = grosspitaevskii(settings, component_count, occupations, guesses, g0);
-	f64 Efull = grosspitaevskii_energy(settings, res.coeff_count, component_count, res.coeff, occupations, g0);
-	printf("\nfull energy: %lf\n", Efull);
+	i64 Ns[] = {4, 8, 16, 32, 64, 128, 256, 512};
 
-#if 1
-	{
-		struct pt_result ptres = rayleigh_schroedinger_pt_rf_2comp(settings, res, g0, occupations);
-		printf("E0:          %.15lf\n", ptres.E0);
-		printf("E1:          %.15lf\n", ptres.E1);
-		printf("E2:          %.15lf\n", ptres.E2);
-		printf("E3:          %.15lf\n", ptres.E3);
-		printf("E0+E1:       %.15lf\n", ptres.E0+ptres.E1);
-		printf("E0+E1+E2:    %.15lf\n", ptres.E0+ptres.E1+ptres.E2);
-		printf("E0+E1+E2+E3: %.15lf\n", ptres.E0+ptres.E1+ptres.E2+ptres.E3);
-		printf("diff: %.15lf\n", Efull - (ptres.E0+ptres.E1+ptres.E2+ptres.E3));
+	FILE* fd = fopen("out", "a");
+	fprintf(fd, "# N\tE\tRS2\tRS3\tEN2\tEN3\n");
+
+	for (u32 i = 0; i < sizeof(Ns)/sizeof(Ns[0]); ++i) {
+		i64 N = Ns[i];
+		i64 occupations[] = {N,N};
+		f64 g0[] = {
+			 1.0/((f64)N-1), -0.5/((f64)N-1),
+			-0.5/((f64)N-1),  1.0/((f64)N-1)
+		};
+
+		struct nlse_result res = grosspitaevskii(settings, component_count, occupations, guesses, g0);
+		f64 Efull = grosspitaevskii_energy(settings, res.coeff_count, component_count, res.coeff, occupations, g0);
+		printf("\nfull energy: %lf\n", Efull);
+
+		struct pt_result rspt = rayleigh_schroedinger_pt_rf_2comp(settings, res, g0, occupations);
+		struct pt_result enpt = en_pt_2comp(settings, res, g0, occupations);
+		fprintf(fd, "%ld\t%.10e\t%.10e\t%.10e\t%.10e\t%.10e\n",
+			N,
+			Efull,
+			rspt.E0+rspt.E1+rspt.E2,
+			rspt.E0+rspt.E1+rspt.E2+rspt.E3,
+			enpt.E0+enpt.E1+enpt.E2,
+			enpt.E0+enpt.E1+enpt.E2+enpt.E3
+			);
+		sbmf_shutdown();
 	}
-	{
-		struct pt_result ptres = en_pt_2comp(settings, res, g0, occupations);
-		printf("E0:          %.15lf\n", ptres.E0);
-		printf("E1:          %.15lf\n", ptres.E1);
-		printf("E2:          %.15lf\n", ptres.E2);
-		printf("E3:          %.15lf\n", ptres.E3);
-		printf("E0+E1:       %.15lf\n", ptres.E0+ptres.E1);
-		printf("E0+E1+E2:    %.15lf\n", ptres.E0+ptres.E1+ptres.E2);
-		printf("E0+E1+E2+E3: %.15lf\n", ptres.E0+ptres.E1+ptres.E2+ptres.E3);
-		printf("diff: %.15lf\n", Efull - (ptres.E0+ptres.E1+ptres.E2+ptres.E3));
-	}
-#endif
 
 
-#if 1
+#if PLOT
     {
         const u32 N = 256;
         plot_init(800, 600, "gp2c");
@@ -168,5 +165,4 @@ int main() {
 #endif
 
 
-	sbmf_shutdown();
 }
