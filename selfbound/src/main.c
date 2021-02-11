@@ -43,7 +43,6 @@ void gaussian1(f64* out, f64* in, u32 len, void* data) {
 
 int main() {
 	sbmf_set_log_callback(log_callback);
-	sbmf_init();
 
 #if USE_GAUSSIAN_GUESS
 	struct nlse_guess guesses[] = {
@@ -103,6 +102,7 @@ int main() {
 			-0.5/((f64)N-1),  1.0/((f64)N-1)
 		};
 
+		sbmf_init();
 		struct nlse_result res = grosspitaevskii(settings, component_count, occupations, guesses, g0);
 		f64 Efull = grosspitaevskii_energy(settings, res.coeff_count, component_count, res.coeff, occupations, g0);
 		printf("\nfull energy: %lf\n", Efull);
@@ -120,6 +120,7 @@ int main() {
 		sbmf_shutdown();
 	}
 
+	fclose(fd);
 
 #if PLOT
     {
