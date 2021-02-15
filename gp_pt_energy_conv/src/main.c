@@ -92,14 +92,14 @@ int main() {
 	i64 occupations[] = {NA,NB};
 
 	f64 g0s[] = {-1.0/6.0, -1.0/3.0, 1.0/3.0, 1.0/6.0};
-	u32 bs[] = {4,8,12,16,24,32,48,64};
+	u32 bs[] = {4,8,12,16,24,32,48,64,80};
 	struct nlse_settings settings = {
         //.spatial_pot_perturbation = perturbation,
 		.max_iterations = 1e5,
-		.max_integration_evals = 1e5,
-		.error_tol = 1e-15,
+		.max_quadgk_iters = 500,
+		.error_tol = 1e-14,
 
-        .num_basis_funcs = 16,
+		.num_basis_funcs = 16,
 		.basis = ho_basis,
 
 		.zero_threshold = 1e-10,
@@ -117,10 +117,10 @@ int main() {
 
 			sbmf_init();
 			struct nlse_result res = grosspitaevskii(settings, component_count, occupations, guesses, g0);
-			f64 Egp = full_energy(settings, res.coeff_count, component_count, res.coeff, occupations, g0);
+			f64 Egp = grosspitaevskii_energy(settings, res.coeff_count, component_count, res.coeff, occupations, g0);
 
-			struct pt_result rs_ptres = rayleigh_schroedinger_pt_rf(settings, res, 0, g0, occupations);
-			struct pt_result en_ptres = en_pt_rf(settings, res, 0, g0, occupations);
+			struct pt_result rs_ptres = rspt_1comp_cuda_new(&settings, res, 0, g0[0], occupations[0]);
+			struct pt_result en_ptres = enpt_1comp_cuda_new(&settings, res, 0, g0[0], occupations[0]);
 
 			//printf("E0:          %.15lf\n", ptres.E0);
 			//printf("E1:          %.15lf\n", ptres.E1);

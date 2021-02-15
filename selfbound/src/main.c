@@ -6,13 +6,6 @@
 #define USE_GAUSSIAN_GUESS 0
 #define USE_RANDOM_GUESS 1
 
-#define PLOT 0
-
-#if PLOT
-	#include <plot/plot.h>
-#endif
-
-
 
 
 
@@ -73,11 +66,10 @@ int main() {
 		.max_quadgk_iters = 500,
 		.error_tol = 1e-14,
 
-        .num_basis_funcs = 16,
+		.num_basis_funcs = 48,
 		.basis = ho_basis,
 
 		.zero_threshold = 1e-10,
-		.orbital_mixing = 0.0,
 		.hamiltonian_mixing = 0.5,
 
 		.orbital_choice = NLSE_ORBITAL_LOWEST_ENERGY,
@@ -89,10 +81,14 @@ int main() {
 
 	const u32 component_count = 2;
 
-	i64 Ns[] = {4, 8, 16, 32, 64, 128, 256, 512};
+	//i64 Ns[] = {4, 8, 16, 32, 64, 128, 256, 512};
+	i64 Ns[] = {4};
 
-	FILE* fd = fopen("out", "a");
-	fprintf(fd, "# N\tE\tRS2\tRS3\tEN2\tEN3\n");
+	{
+		FILE* fd = fopen("out", "a");
+		fprintf(fd, "# N\tE\tRS2\tRS3\tEN2\tEN3\n");
+		fclose(fd);
+	}
 
 	for (u32 i = 0; i < sizeof(Ns)/sizeof(Ns[0]); ++i) {
 		i64 N = Ns[i];
@@ -109,61 +105,22 @@ int main() {
 
 		struct pt_result rspt = rayleigh_schroedinger_pt_rf_2comp(settings, res, g0, occupations);
 		struct pt_result enpt = en_pt_2comp(settings, res, g0, occupations);
-		fprintf(fd, "%ld\t%.10e\t%.10e\t%.10e\t%.10e\t%.10e\n",
-			N,
-			Efull,
-			rspt.E0+rspt.E1+rspt.E2,
-			rspt.E0+rspt.E1+rspt.E2+rspt.E3,
-			enpt.E0+enpt.E1+enpt.E2,
-			enpt.E0+enpt.E1+enpt.E2+enpt.E3
-			);
+		{
+			FILE* fd = fopen("out", "a");
+			fprintf(fd, "%ld\t%.10e\t%.10e\t%.10e\t%.10e\t%.10e\n",
+					N,
+					Efull,
+					rspt.E0+rspt.E1+rspt.E2,
+					rspt.E0+rspt.E1+rspt.E2+rspt.E3,
+					enpt.E0+enpt.E1+enpt.E2,
+					enpt.E0+enpt.E1+enpt.E2+enpt.E3
+					);
+			fclose(fd);
+		}
+
 		sbmf_shutdown();
 	}
 
-	fclose(fd);
-
-#if PLOT
-    {
-        const u32 N = 256;
-        plot_init(800, 600, "gp2c");
-        f32 potdata[N], adata[N], bdata[N];
-        sample_space sp = make_linspace(1, -5, 5, N);
-
-        for (u32 i = 0; i < N; ++i) {
-            f64 x = sp.points[i];
-            potdata[i] = (f32) ho_potential(&x,1,0);
-        }
-        push_line_plot(&(plot_push_desc){
-                .space = &sp,
-                .data = potdata,
-                .label = "potential",
-                });
-
-
-        f64 sample_in[N];
-        for (u32 i = 0; i < N; ++i) {
-            sample_in[i] = (f64) sp.points[i];
-        }
-
-        for (u32 i = 0; i < res.component_count; ++i) {
-            f64 sample_out[N];
-            ho_sample(res.coeff_count, &res.coeff[i*res.coeff_count], N, sample_out, sample_in);
-
-            f32 data[N];
-            for (u32 k = 0; k < N; ++k) {
-                data[k] = fabs(sample_out[k])*fabs(sample_out[k]);
-            }
-            push_line_plot(&(plot_push_desc){
-                    .space = &sp,
-                    .data = data,
-                    .label = plot_snprintf("comp: %u", i),
-                    .offset = res.energy[i],
-                    });
-        }
-		plot_update_until_closed();
-        plot_shutdown();
-	}
-#endif
 
 
 }
