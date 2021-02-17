@@ -73,16 +73,15 @@ int main() {
 	struct nlse_guess* default_guesses = NULL;
 
 	i64 N = 100;
-	f64 l0s[] = {-5,-4,-3,-2,0,-1,1,2,3,4,5};
+	f64 l0s[] = {-2,-1.75,-1.5,-1.25,-1,-0.75,-0.5,-0.25,0.25,0.5,0.75,1,1.25,1.5,1.75,2};
 	//f64 l0s[] = {};
 	//i64 range_N[] = {100, 500, 15000};
 	struct nlse_settings settings = {
-        //.spatial_pot_perturbation = perturbation,
 		.max_iterations = 1e5,
-		.max_integration_evals = 1e5,
+		.max_quadgk_iters = 500,
 		.error_tol = 1e-14,
 
-        .num_basis_funcs = 16,
+		.num_basis_funcs = 64,
 		.basis = ho_basis,
 		.hamiltonian_mixing = 0.5,
 
@@ -107,8 +106,8 @@ int main() {
 		bmf_gaussian_res = best_meanfield(settings, N, g0, gaussian_guesses);
 		bmf_default_res = best_meanfield(settings, N, g0, default_guesses);
 
-		struct pt_result rs_ptres = rayleigh_schroedinger_pt_rf(settings, res, 0, &g0, &N);
-		struct pt_result en_ptres = en_pt_rf(settings, res, 0, &g0, &N);
+		struct pt_result rs_ptres = rspt_1comp_cuda_new(&settings, res, 0, g0, N);
+		struct pt_result en_ptres = enpt_1comp_cuda_new(&settings, res, 0, g0, N);
 
 		//printf("E0:          %.15lf\n", ptres.E0);
 		//printf("E1:          %.15lf\n", ptres.E1);
@@ -119,10 +118,7 @@ int main() {
 		//printf("E0+E1+E2+E3: %.15lf\n", ptres.E0+ptres.E1+ptres.E2+ptres.E3);
 
 		{
-			char buf[256];
-			snprintf(buf, 256, "out", l0s[j]);
-
-			FILE* fd = fopen(buf, "a");
+			FILE* fd = fopen("out", "a");
 			fprintf(fd, "%.10lf\t%.10lf\t%.10f\t%.10f\t%.10lf\t%.10lf\t%.10lf\t%.10lf\n",
 					l0s[j],
 					Egp,

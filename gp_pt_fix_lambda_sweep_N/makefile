@@ -1,6 +1,7 @@
 PROJECT = gp
 
 SRCS = src/main.c
+CC = /usr/local/cuda/bin/nvcc
 
 DEBUG_FLAGS = -g \
               -fsanitize=address \
@@ -12,4 +13,4 @@ DEBUG_FLAGS = -g \
               -fsanitize=signed-integer-overflow
 
 $(PROJECT): $(SRCS)
-	$(CC) -o $(PROJECT) $(SRCS) -O3 -L../ -I../ -l:sbmf.a -lm -lpthread -fopenmp -lgfortran
+	$(CC) -o $(PROJECT) $(SRCS) -O3 -L../ -I../ -l:sbmf.a -lm -lpthread -lgfortran -Xcompiler -fopenmp

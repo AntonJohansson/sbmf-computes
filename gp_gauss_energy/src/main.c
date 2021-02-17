@@ -36,7 +36,7 @@ int main() {
 		.max_quadgk_iters = 500,
 		.error_tol = 1e-14,
 
-        .num_basis_funcs = 48,
+		.num_basis_funcs = 64,
 		.basis = ho_basis,
 		.hamiltonian_mixing = 0.5,
 
@@ -48,7 +48,7 @@ int main() {
 	const u32 component_count = 1;
 
 	f64 lambda = -1.0;
-	i64 Ns[] = {4,8,12,16,20,24,28,32};
+	i64 Ns[] = {4,6,8,12,16,20,24,28,32};
 
 	FILE* default_fd = fopen("out_default_E", "a");
 	FILE* random_fd = fopen("out_random_E", "a");
@@ -71,11 +71,11 @@ int main() {
 		struct bestmf_result bmf_default = best_meanfield(settings, N, g0, default_guesses);
 		struct bestmf_result bmf_random = best_meanfield(settings, N, g0, random_guesses);
 
-		struct pt_result rs_default_ptres = rayleigh_schroedinger_pt_rf(settings, gp_default_res, 0, &g0, &N);
-		struct pt_result en_default_ptres = en_pt_rf(settings, gp_default_res, 0, &g0, &N);
+		struct pt_result rs_default_ptres = rspt_1comp_cuda_new(&settings, gp_default_res, 0, g0, N);
+		struct pt_result en_default_ptres = enpt_1comp_cuda_new(&settings, gp_default_res, 0, g0, N);
 
-		struct pt_result rs_random_ptres = rayleigh_schroedinger_pt_rf(settings, gp_random_res, 0, &g0, &N);
-		struct pt_result en_random_ptres = en_pt_rf(settings, gp_random_res, 0, &g0, &N);
+		struct pt_result rs_random_ptres = rspt_1comp_cuda_new(&settings, gp_random_res, 0, g0, N);
+		struct pt_result en_random_ptres = enpt_1comp_cuda_new(&settings, gp_random_res, 0, g0, N);
 
 		{
 			fprintf(default_fd, "%ld\t%.10e\t%.10e\t%.10e\t%.10e\t%.10e\t%.10e\t%.10e\n",

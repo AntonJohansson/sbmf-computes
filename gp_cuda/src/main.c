@@ -86,6 +86,8 @@ int main() {
 	sbmf_set_log_callback(log_callback);
 	sbmf_init();
 
+	OMEGA = 0.1;
+
 #if USE_GAUSSIAN_GUESS
 	struct nlse_guess guesses[] = {
 		[0] = {
@@ -129,14 +131,9 @@ int main() {
 		.basis = ho_basis,
 
 		.zero_threshold = 1e-10,
-		.orbital_mixing = 0.0,
-		.hamiltonian_mixing = 0.0,
-		.mix_until_iteration = 0,
+		.hamiltonian_mixing = 0.5,
 
 		.orbital_choice = NLSE_ORBITAL_LOWEST_ENERGY,
-		//.orbital_choice = NLSE_ORBITAL_MAXIMUM_OVERLAP,
-		.mom_orbitals_to_consider = 8,
-		.mom_enable_at_iteration = 0,
 
 		.gk=gk20
     };
@@ -155,8 +152,8 @@ int main() {
 		//struct pt_result ptres = rspt_1comp_cuda_new(&settings, res, 0, g0[0], occupations[0]);
 		//struct pt_result ptres = enpt_1comp_cuda_new(&settings, res, 0, g0[0], occupations[0]);
 		//struct pt_result ptres = enpt_1comp_cuda(settings, res, 0, g0, occupations);
-		//struct pt_result ptres = rspt_2comp_cuda_new(&settings, res, 0, 1, g0[0], g0[1], occupations[0], occupations[1]);
-		struct pt_result ptres = enpt_2comp_cuda_new(&settings, res, 0, 1, g0[0], g0[1], occupations[0], occupations[1]);
+		struct pt_result ptres = rspt_2comp_cuda_new(&settings, res, 0, 1, g0[0], g0[1], occupations[0], occupations[1]);
+		//struct pt_result ptres = enpt_2comp_cuda_new(&settings, res, 0, 1, g0[0], g0[1], occupations[0], occupations[1]);
 		//struct pt_result ptres = en_pt_2comp(settings, res, g0, occupations);
 		printf("E0:          %.15lf\n", ptres.E0);
 		printf("E1:          %.15lf\n", ptres.E1);

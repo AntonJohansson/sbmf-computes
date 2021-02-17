@@ -66,7 +66,7 @@ int main() {
 		.max_quadgk_iters = 500,
 		.error_tol = 1e-14,
 
-		.num_basis_funcs = 48,
+		.num_basis_funcs = 32,
 		.basis = ho_basis,
 
 		.zero_threshold = 1e-10,
@@ -77,12 +77,12 @@ int main() {
 		.gk=gk20
     };
 
-	OMEGA = 0.01;
+	OMEGA = 0.1;
 
 	const u32 component_count = 2;
 
 	//i64 Ns[] = {4, 8, 16, 32, 64, 128, 256, 512};
-	i64 Ns[] = {4};
+	i64 Ns[] = {4, 10, 50, 100, 500, 1000};
 
 	{
 		FILE* fd = fopen("out", "a");
@@ -94,8 +94,8 @@ int main() {
 		i64 N = Ns[i];
 		i64 occupations[] = {N,N};
 		f64 g0[] = {
-			 1.0/((f64)N-1), -0.5/((f64)N-1),
-			-0.5/((f64)N-1),  1.0/((f64)N-1)
+			 1.0/((f64)N-1), -0.50/((f64)N-1),
+			-0.50/((f64)N-1),  1.0/((f64)N-1)
 		};
 
 		sbmf_init();
@@ -103,8 +103,8 @@ int main() {
 		f64 Efull = grosspitaevskii_energy(settings, res.coeff_count, component_count, res.coeff, occupations, g0);
 		printf("\nfull energy: %lf\n", Efull);
 
-		struct pt_result rspt = rayleigh_schroedinger_pt_rf_2comp(settings, res, g0, occupations);
-		struct pt_result enpt = en_pt_2comp(settings, res, g0, occupations);
+		struct pt_result rspt = rspt_2comp_cuda_new(&settings, res, 0, 1, g0[0], g0[1], occupations[0], occupations[1]);
+		struct pt_result enpt = enpt_2comp_cuda_new(&settings, res, 0, 1, g0[0], g0[1], occupations[0], occupations[1]);
 		{
 			FILE* fd = fopen("out", "a");
 			fprintf(fd, "%ld\t%.10e\t%.10e\t%.10e\t%.10e\t%.10e\n",

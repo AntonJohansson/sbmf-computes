@@ -75,14 +75,14 @@ int main() {
 	f64 l0s[] = {-0.5, -1.0, 1.0, 0.5};
 	//f64 l0s[] = {};
 	//i64 range_N[] = {100, 500, 15000};
-	i64 Ns[] = {10, 100, 1000, 100000, 1000000};
+	i64 Ns[] = {4,10,20,30,40,50,60,70,80,90,100};
 	struct nlse_settings settings = {
         //.spatial_pot_perturbation = perturbation,
 		.max_iterations = 1e5,
-		.max_integration_evals = 1e5,
+		.max_quadgk_iters = 500,
 		.error_tol = 1e-14,
 
-        .num_basis_funcs = 32,
+		.num_basis_funcs = 48,
 		.basis = ho_basis,
 
 		.zero_threshold = 1e-10,
@@ -113,16 +113,8 @@ int main() {
 			bmf_gaussian_res = best_meanfield(settings, N, g0, gaussian_guesses);
  			bmf_default_res = best_meanfield(settings, N, g0, default_guesses);
 
-			struct pt_result rs_ptres = rayleigh_schroedinger_pt_rf(settings, res, 0, &g0, &N);
-			struct pt_result en_ptres = en_pt_rf(settings, res, 0, &g0, &N);
-
-			//printf("E0:          %.15lf\n", ptres.E0);
-			//printf("E1:          %.15lf\n", ptres.E1);
-			//printf("E2:          %.15lf\n", ptres.E2);
-			//printf("E3:          %.15lf\n", ptres.E3);
-			//printf("E0+E1:       %.15lf\n", ptres.E0+ptres.E1);
-			//printf("E0+E1+E2:    %.15lf\n", ptres.E0+ptres.E1+ptres.E2);
-			//printf("E0+E1+E2+E3: %.15lf\n", ptres.E0+ptres.E1+ptres.E2+ptres.E3);
+			struct pt_result rs_ptres = rspt_1comp_cuda_new(&settings, res, 0, g0, N);
+			struct pt_result en_ptres = enpt_1comp_cuda_new(&settings, res, 0, g0, N);
 
 			{
 				char buf[256];
