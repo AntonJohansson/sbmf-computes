@@ -77,22 +77,21 @@ int main() {
 		.gk=gk20
     };
 
-	OMEGA = 0.1;
-
 	const u32 component_count = 2;
 
-	//i64 Ns[] = {4, 8, 16, 32, 64, 128, 256, 512};
-	i64 Ns[] = {4, 10, 50, 100, 500, 1000};
+	i64 N = 4;
+	//f64 Os[] = {1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1};
+	f64 Os[] = {0.01, 0.001};
 
 	{
 		FILE* fd = fopen("out", "a");
-		fprintf(fd, "# N\tE\tRS2\tRS3\tEN2\tEN3\n");
+		fprintf(fd, "# OMEGA\tE\tRS2\tRS3\tEN2\tEN3\n");
 		fclose(fd);
 	}
 
 	f64 lambda = 0.5;
-	for (u32 i = 0; i < sizeof(Ns)/sizeof(Ns[0]); ++i) {
-		i64 N = Ns[i];
+	for (u32 i = 0; i < sizeof(Os)/sizeof(Os[0]); ++i) {
+		OMEGA = Os[i];
 		i64 occupations[] = {N,N};
 		f64 g0[] = {
 			 lambda/((f64)N-1), -0.5*lambda/((f64)N-1),
@@ -108,8 +107,8 @@ int main() {
 		struct pt_result enpt = enpt_2comp_cuda_new(&settings, res, 0, 1, g0[0], g0[1], occupations[0], occupations[1]);
 		{
 			FILE* fd = fopen("out", "a");
-			fprintf(fd, "%ld\t%.10e\t%.10e\t%.10e\t%.10e\t%.10e\n",
-					N,
+			fprintf(fd, "%lf\t%.10e\t%.10e\t%.10e\t%.10e\t%.10e\n",
+					OMEGA,
 					Efull,
 					rspt.E0+rspt.E1+rspt.E2,
 					rspt.E0+rspt.E1+rspt.E2+rspt.E3,

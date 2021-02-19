@@ -36,7 +36,7 @@ int main() {
 		.max_quadgk_iters = 500,
 		.error_tol = 1e-14,
 
-		.num_basis_funcs = 64,
+		.num_basis_funcs = 32,
 		.basis = ho_basis,
 		.hamiltonian_mixing = 0.5,
 
@@ -47,7 +47,7 @@ int main() {
 
 	const u32 component_count = 1;
 
-	f64 lambda = -1.0;
+	f64 lambda = -0.5;
 	i64 Ns[] = {4,6,8,12,16,20,24,28,32};
 
 	FILE* default_fd = fopen("out_default_E", "a");
