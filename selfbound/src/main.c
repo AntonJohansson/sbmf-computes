@@ -82,44 +82,52 @@ int main() {
 	const u32 component_count = 2;
 
 	//i64 Ns[] = {4, 8, 16, 32, 64, 128, 256, 512};
-	i64 Ns[] = {4, 10, 50, 100, 500, 1000};
-
-	{
-		FILE* fd = fopen("out", "a");
-		fprintf(fd, "# N\tE\tRS2\tRS3\tEN2\tEN3\n");
-		fclose(fd);
-	}
+	i64 Ns[] = {10, 50, 100, 500, 1000};
+	f64 Os[] = {0.3, 0.2, 0.15, 0.1};
 
 	f64 lambda = 0.5;
-	for (u32 i = 0; i < sizeof(Ns)/sizeof(Ns[0]); ++i) {
-		i64 N = Ns[i];
-		i64 occupations[] = {N,N};
-		f64 g0[] = {
-			 lambda/((f64)N-1), -0.5*lambda/((f64)N-1),
-			-0.5*lambda/((f64)N-1),  lambda/((f64)N-1)
-		};
+	for (u32 j = 0; j < sizeof(Os)/sizeof(Os[0]); ++j) {
+		OMEGA = Os[j];
 
-		sbmf_init();
-		struct nlse_result res = grosspitaevskii(settings, component_count, occupations, guesses, g0);
-		f64 Efull = grosspitaevskii_energy(settings, res.coeff_count, component_count, res.coeff, occupations, g0);
-		printf("\nfull energy: %lf\n", Efull);
-
-		struct pt_result rspt = rspt_2comp_cuda_new(&settings, res, 0, 1, g0[0], g0[1], occupations[0], occupations[1]);
-		struct pt_result enpt = enpt_2comp_cuda_new(&settings, res, 0, 1, g0[0], g0[1], occupations[0], occupations[1]);
+		char buf[50];
+		snprintf(buf, 50, "out_%lf", Os[j]);
 		{
-			FILE* fd = fopen("out", "a");
-			fprintf(fd, "%ld\t%.10e\t%.10e\t%.10e\t%.10e\t%.10e\n",
-					N,
-					Efull,
-					rspt.E0+rspt.E1+rspt.E2,
-					rspt.E0+rspt.E1+rspt.E2+rspt.E3,
-					enpt.E0+enpt.E1+enpt.E2,
-					enpt.E0+enpt.E1+enpt.E2+enpt.E3
-					);
+			FILE* fd = fopen(buf, "a");
+			fprintf(fd, "# N\tE\tRS2\tRS3\tEN2\tEN3\n");
 			fclose(fd);
 		}
 
-		sbmf_shutdown();
+
+		for (u32 i = 0; i < sizeof(Ns)/sizeof(Ns[0]); ++i) {
+			i64 N = Ns[i];
+			i64 occupations[] = {N,N};
+			f64 g0[] = {
+				 lambda/((f64)N-1), -0.5*lambda/((f64)N-1),
+				-0.5*lambda/((f64)N-1),  lambda/((f64)N-1)
+			};
+
+			sbmf_init();
+			struct nlse_result res = grosspitaevskii(settings, component_count, occupations, guesses, g0);
+			f64 Efull = grosspitaevskii_energy(settings, res.coeff_count, component_count, res.coeff, occupations, g0);
+			printf("\nfull energy: %lf\n", Efull);
+
+			struct pt_result rspt = rspt_2comp_cuda_new(&settings, res, 0, 1, g0[0], g0[1], occupations[0], occupations[1]);
+			struct pt_result enpt = enpt_2comp_cuda_new(&settings, res, 0, 1, g0[0], g0[1], occupations[0], occupations[1]);
+			{
+				FILE* fd = fopen(buf, "a");
+				fprintf(fd, "%ld\t%.10e\t%.10e\t%.10e\t%.10e\t%.10e\n",
+						N,
+						Efull,
+						rspt.E0+rspt.E1+rspt.E2,
+						rspt.E0+rspt.E1+rspt.E2+rspt.E3,
+						enpt.E0+enpt.E1+enpt.E2,
+						enpt.E0+enpt.E1+enpt.E2+enpt.E3
+						);
+				fclose(fd);
+			}
+
+			sbmf_shutdown();
+		}
 	}
 
 
