@@ -1,8 +1,10 @@
 #include <sbmf/sbmf.h>
+#include <math.h>
 
 #include <stdio.h>
 
-#define PERTURBATION(x) 2*gaussian(x, 0, 0.2)
+//#define PERTURBATION(x) 2*gaussian(x, 0, 0.2)
+#define PERTURBATION(x) (1.0/(cosh(2.0*x)*cosh(2.0*x)))
 
 void perturbation(const u32 len, f64 out[static len],
                                 f64 in_x[static len], const u32 component_count,
@@ -17,30 +19,9 @@ void log_callback(enum sbmf_log_level log_level, const char* msg) {
 	printf("%s\n", msg);
 }
 
-struct full_energy_integrand_params {
-    u32 coeff_count;
-    f64* coeff_a;
-    f64* coeff_b;
-    struct basis basis;
-};
-
-/* Integrand of the form |a|^2|b|^2 */
-void norm_overlap_integrand(f64* out, f64* in, u32 len, void* data) {
-    struct full_energy_integrand_params* p = data;
-
-    f64 sample_a[len];
-    p->basis.sample(p->coeff_count, p->coeff_a, len, sample_a, in);
-
-    f64 sample_b[len];
-    p->basis.sample(p->coeff_count, p->coeff_b, len, sample_b, in);
-
-    for (u32 i = 0; i < len; ++i) {
-        out[i] = sample_a[i]*sample_a[i]*sample_b[i]*sample_b[i];
-    }
-}
-
 int main() {
 	sbmf_set_log_callback(log_callback);
+	OMEGA = 0.1;
 
 	struct nlse_guess random_guesses[] = {
 		[0] = {
@@ -69,9 +50,8 @@ int main() {
 
 	const u32 component_count = 1;
 
-	f64 lambda = -0.0;
-	//i64 Ns[] = {4,6,8,12,16,20,24,28,32};
-	i64 Ns[] = {8};
+	f64 lambda = -1.0;
+	i64 Ns[] = {4,6,8,12,16,20,24,28,32};
 
 	FILE* default_fd = fopen("out_default_E", "a");
 	FILE* random_fd = fopen("out_random_E", "a");
@@ -91,38 +71,7 @@ int main() {
 		f64 Egp_default = grosspitaevskii_energy(settings, gp_default_res.coeff_count, component_count, gp_default_res.coeff, &N, &g0);
 		f64 Egp_random  = grosspitaevskii_energy(settings, gp_random_res.coeff_count, component_count, gp_random_res.coeff, &N, &g0);
 
-		{
-			struct full_energy_integrand_params p = {
-				.coeff_count = gp_default_res.coeff_count,
-				.coeff_a = &gp_default_res.coeff[0],
-				.coeff_b = &gp_default_res.coeff[gp_default_res.coeff_count],
-				.basis = settings.basis,
-			};
-
-			struct quadgk_settings int_settings = {
-				.max_iters = 500,
-				.abs_error_tol = 1e-15,
-				.userdata = &p,
-				.gk = gk20
-			};
-
-			u8 quadgk_memory[quadgk_required_memory_size(&int_settings)];
-
-			struct quadgk_result ires;
-			quadgk_infinite_interval(norm_overlap_integrand, &int_settings, quadgk_memory, &ires);
-			f64 B = ires.integral;
-
-			p.coeff_a = &gp_default_res.coeff[0];
-			quadgk_infinite_interval(norm_overlap_integrand, &int_settings, quadgk_memory, &ires);
-			f64 A0 = ires.integral;
-
-			//f64 NC = (Egp_default - Egp_random)/(3.0*B - A0);
-			f64 NC = (gp_default_res.energy[1] - gp_default_res.energy[0])/(3.0*B - A0);
-			printf("..... NC: %lf\n", NC);
-		}
-
-
-#if 0
+#if 1
 		struct bestmf_result bmf_default = best_meanfield(settings, N, g0, default_guesses);
 		struct bestmf_result bmf_random = best_meanfield(settings, N, g0, random_guesses);
 

@@ -247,6 +247,7 @@ struct nlse_settings {
 	u32 max_iterations;
 	u32 max_quadgk_iters;
 	f64 abs_error_tol;
+	f64 rel_error_tol;
 
 	/* Separating out the spatial potentiential
 	 * allows for optimizations */
