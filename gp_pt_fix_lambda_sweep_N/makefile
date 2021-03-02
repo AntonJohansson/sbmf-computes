@@ -13,4 +13,4 @@ DEBUG_FLAGS = -g \
               -fsanitize=signed-integer-overflow
 
 $(PROJECT): $(SRCS)
-	$(CC) -o $(PROJECT) $(SRCS) -O3 -L../ -I../ -l:sbmf.a -lm -lpthread -lgfortran -Xcompiler -fopenmp
+	$(CC) -o $(PROJECT) $(SRCS) -O3 -L../../sbmf/build -I../../sbmf/include -l:sbmf.a -lm -lpthread -lgfortran -Xcompiler -fopenmp
