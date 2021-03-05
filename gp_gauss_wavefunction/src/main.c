@@ -39,9 +39,9 @@ int main() {
         .spatial_pot_perturbation = perturbation,
 		.max_iterations = 1e5,
 		.max_quadgk_iters = 500,
-		.error_tol = 1e-14,
+		.abs_error_tol = 1e-14,
 
-        .num_basis_funcs = 48,
+        .num_basis_funcs = 64,
 		.basis = ho_basis,
 		.hamiltonian_mixing = 0.5,
 

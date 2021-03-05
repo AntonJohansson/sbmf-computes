@@ -3,8 +3,8 @@
 
 #include <stdio.h>
 
-//#define PERTURBATION(x) 2*gaussian(x, 0, 0.2)
-#define PERTURBATION(x) (1.0/(cosh(2.0*x)*cosh(2.0*x)))
+#define PERTURBATION(x) gaussian(x, 0, 0.2)
+//#define PERTURBATION(x) (1.0/(cosh(2.0*x)*cosh(2.0*x)))
 
 void perturbation(const u32 len, f64 out[static len],
                                 f64 in_x[static len], const u32 component_count,
@@ -21,7 +21,7 @@ void log_callback(enum sbmf_log_level log_level, const char* msg) {
 
 int main() {
 	sbmf_set_log_callback(log_callback);
-	OMEGA = 0.1;
+	//OMEGA = 0.1;
 
 	struct nlse_guess random_guesses[] = {
 		[0] = {
@@ -39,7 +39,7 @@ int main() {
 		.max_quadgk_iters = 500,
 		.abs_error_tol = 1e-14,
 
-		.num_basis_funcs = 32,
+		.num_basis_funcs = 64,
 		.basis = ho_basis,
 		.hamiltonian_mixing = 0.5,
 
@@ -72,8 +72,8 @@ int main() {
 		f64 Egp_random  = grosspitaevskii_energy(settings, gp_random_res.coeff_count, component_count, gp_random_res.coeff, &N, &g0);
 
 #if 1
-		struct bestmf_result bmf_default = best_meanfield(settings, N, g0, default_guesses);
-		struct bestmf_result bmf_random = best_meanfield(settings, N, g0, random_guesses);
+		f64 bmf_default = bestmf_find_fractional_occupation(settings, N, g0, default_guesses);
+		f64 bmf_random  = bestmf_find_fractional_occupation(settings, N, g0, random_guesses);
 
 		struct pt_result rs_default_ptres = rspt_1comp_cuda_new(&settings, gp_default_res, 0, g0, N);
 		struct pt_result en_default_ptres = enpt_1comp_cuda_new(&settings, gp_default_res, 0, g0, N);
@@ -86,7 +86,7 @@ int main() {
 					N,
 					gp_default_res.energy[0],
 					Egp_default,
-					bmf_default.energy,
+					bmf_default,
 					rs_default_ptres.E0 + rs_default_ptres.E1 + rs_default_ptres.E2,
 					rs_default_ptres.E0 + rs_default_ptres.E1 + rs_default_ptres.E2 + rs_default_ptres.E3,
 					en_default_ptres.E0 + en_default_ptres.E1 + en_default_ptres.E2,
@@ -98,7 +98,7 @@ int main() {
 					N,
 					gp_random_res.energy[0],
 					Egp_random,
-					bmf_random.energy,
+					bmf_random,
 					rs_random_ptres.E0 + rs_random_ptres.E1 + rs_random_ptres.E2,
 					rs_random_ptres.E0 + rs_random_ptres.E1 + rs_random_ptres.E2 + rs_random_ptres.E3,
 					en_random_ptres.E0 + en_random_ptres.E1 + en_random_ptres.E2,
