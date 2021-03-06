@@ -62,9 +62,9 @@ int main() {
 #endif
 
 	struct nlse_settings settings = {
-		.max_iterations = 1e5,
+		.max_iterations = 1000,
 		.max_quadgk_iters = 500,
-		.error_tol = 1e-14,
+		.abs_error_tol = 1e-14,
 
 		.num_basis_funcs = 64,
 		.basis = ho_basis,
@@ -81,7 +81,7 @@ int main() {
 
 	i64 N = 4;
 	//f64 Os[] = {1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1};
-	f64 Os[] = {0.15};
+	f64 Os[] = {0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.02, 0.01};
 
 	{
 		FILE* fd = fopen("out", "a");
