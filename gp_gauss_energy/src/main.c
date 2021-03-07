@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#define PERTURBATION(x) gaussian(x, 0, 0.2)
+#define PERTURBATION(x) 2*gaussian(x, 0, 0.1)
 //#define PERTURBATION(x) (1.0/(cosh(2.0*x)*cosh(2.0*x)))
 
 void perturbation(const u32 len, f64 out[static len],
