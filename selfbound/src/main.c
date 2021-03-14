@@ -70,7 +70,7 @@ int main() {
 		.basis = ho_basis,
 
 		.zero_threshold = 1e-10,
-		.hamiltonian_mixing = 0.6,
+		.hamiltonian_mixing = 0.7,
 
 		.orbital_choice = NLSE_ORBITAL_LOWEST_ENERGY,
 
@@ -82,58 +82,63 @@ int main() {
 	const u32 component_count = 2;
 
 	//i64 Ns[] = {4, 8, 16, 32, 64, 128, 256, 512};
-	i64 Ns[] = {10,25,50,75,100,250,500,750,1000,1500,2000,2500,3000,3500,4000};
+	i64 Ns[] = {10,25,50,75,100,250,500,750,1000,1500,2000};
 	//f64 Os[] = {0.3, 0.2, 0.15, 0.1};
-	f64 Os[] = {0.1, 0.05, 0.025};
+	//f64 Os[] = {0.1, 0.05, 0.025};
+	f64 Os[] = {0.05};
+	f64 gAB_factors[] = {-0.7, -0.8, -0.9};
 
 	f64 lambda = 0.5;
-	for (u32 j = 0; j < sizeof(Os)/sizeof(Os[0]); ++j) {
-		OMEGA = Os[j];
+	for (u32 k = 0; k < sizeof(gAB_factors)/sizeof(gAB_factors[0]); ++k) {
+		f64 gAB_factor = gAB_factors[k];
 
-		char buf[50];
-		snprintf(buf, 50, "out_%lf", Os[j]);
-		{
-			FILE* fd = fopen(buf, "a");
-			fprintf(fd, "# N\tE\tRS2\tRS3\tEN2\tEN3\n");
-			fclose(fd);
-		}
+		for (u32 j = 0; j < sizeof(Os)/sizeof(Os[0]); ++j) {
+			OMEGA = Os[j];
 
-		f64 gAB_factor = -0.6;
-
-		for (u32 i = 0; i < sizeof(Ns)/sizeof(Ns[0]); ++i) {
-			i64 N = Ns[i];
-			i64 occupations[] = {N,N};
-			f64 g0[] = {
-				 lambda/((f64)N-1), gAB_factor*lambda/((f64)N-1),
-				 gAB_factor*lambda/((f64)N-1),  lambda/((f64)N-1)
-			};
-
-			//f64 g0[] = {
-			//	lambda/((f64)2000-1.0), -0.5*lambda/((f64)2000-1.0),
-			//	-0.5*lambda/((f64)2000-1.0), lambda/((f64)2000-1.0)
-			//};
-
-			sbmf_init();
-			struct nlse_result res = grosspitaevskii(settings, component_count, occupations, guesses, g0);
-			f64 Efull = grosspitaevskii_energy(settings, res.coeff_count, component_count, res.coeff, occupations, g0);
-			printf("\nfull energy: %lf\n", Efull);
-
-			struct pt_result rspt = rspt_2comp_cuda_new(&settings, res, 0, 1, g0[0], g0[1], occupations[0], occupations[1]);
-			struct pt_result enpt = enpt_2comp_cuda_new(&settings, res, 0, 1, g0[0], g0[1], occupations[0], occupations[1]);
+			char buf[128];
+			snprintf(buf, 128, "out_%lf_gab_%lf", Os[j], gAB_factor);
 			{
 				FILE* fd = fopen(buf, "a");
-				fprintf(fd, "%ld\t%.10e\t%.10e\t%.10e\t%.10e\t%.10e\n",
-						N,
-						Efull,
-						rspt.E0+rspt.E1+rspt.E2,
-						rspt.E0+rspt.E1+rspt.E2+rspt.E3,
-						enpt.E0+enpt.E1+enpt.E2,
-						enpt.E0+enpt.E1+enpt.E2+enpt.E3
-						);
+				fprintf(fd, "# N\tE\tRS2\tRS3\tEN2\tEN3\n");
 				fclose(fd);
 			}
 
-			sbmf_shutdown();
+
+			for (u32 i = 0; i < sizeof(Ns)/sizeof(Ns[0]); ++i) {
+				i64 N = Ns[i];
+				i64 occupations[] = {N,N};
+				f64 g0[] = {
+					 lambda/((f64)N-1), gAB_factor*lambda/((f64)N-1),
+					 gAB_factor*lambda/((f64)N-1),  lambda/((f64)N-1)
+				};
+
+				//f64 g0[] = {
+				//	lambda/((f64)2000-1.0), -0.5*lambda/((f64)2000-1.0),
+				//	-0.5*lambda/((f64)2000-1.0), lambda/((f64)2000-1.0)
+				//};
+
+				sbmf_init();
+				struct nlse_result res = grosspitaevskii(settings, component_count, occupations, guesses, g0);
+				f64 Efull = grosspitaevskii_energy(settings, res.coeff_count, component_count, res.coeff, occupations, g0);
+				printf("\nfull energy: %lf\n", Efull);
+
+				struct pt_result rspt = rspt_2comp_cuda_new(&settings, res, 0, 1, g0[0], g0[1], occupations[0], occupations[1]);
+				struct pt_result enpt = enpt_2comp_cuda_new(&settings, res, 0, 1, g0[0], g0[1], occupations[0], occupations[1]);
+				{
+					FILE* fd = fopen(buf, "a");
+					fprintf(fd, "%ld\t%.10e\t%.10e\t%.10e\t%.10e\t%.10e\n",
+							N,
+							Efull,
+							rspt.E0+rspt.E1+rspt.E2,
+							rspt.E0+rspt.E1+rspt.E2+rspt.E3,
+							enpt.E0+enpt.E1+enpt.E2,
+							enpt.E0+enpt.E1+enpt.E2+enpt.E3
+							);
+					fclose(fd);
+				}
+
+				sbmf_shutdown();
+			}
 		}
 	}
 
