@@ -70,7 +70,7 @@ int main() {
 		.basis = ho_basis,
 
 		.zero_threshold = 1e-10,
-		.hamiltonian_mixing = 0.5,
+		.hamiltonian_mixing = 0.6,
 
 		.orbital_choice = NLSE_ORBITAL_LOWEST_ENERGY,
 
@@ -82,7 +82,7 @@ int main() {
 	const u32 component_count = 2;
 
 	//i64 Ns[] = {4, 8, 16, 32, 64, 128, 256, 512};
-	i64 Ns[] = {10,25,50,75,100,250,500,750,1000,1500,2000};
+	i64 Ns[] = {10,25,50,75,100,250,500,750,1000,1500,2000,2500,3000,3500,4000};
 	//f64 Os[] = {0.3, 0.2, 0.15, 0.1};
 	f64 Os[] = {0.1, 0.05, 0.025};
 
@@ -98,13 +98,14 @@ int main() {
 			fclose(fd);
 		}
 
+		f64 gAB_factor = -0.6;
 
 		for (u32 i = 0; i < sizeof(Ns)/sizeof(Ns[0]); ++i) {
 			i64 N = Ns[i];
 			i64 occupations[] = {N,N};
 			f64 g0[] = {
-				 lambda/((f64)N-1), -0.5*lambda/((f64)N-1),
-				-0.5*lambda/((f64)N-1),  lambda/((f64)N-1)
+				 lambda/((f64)N-1), gAB_factor*lambda/((f64)N-1),
+				 gAB_factor*lambda/((f64)N-1),  lambda/((f64)N-1)
 			};
 
 			//f64 g0[] = {

@@ -73,17 +73,18 @@ int main() {
 	struct nlse_guess* default_guesses = NULL;
 
 	i64 N = 100;
-	f64 l0s[] = {-2,-1.75,-1.5,-1.25,-1,-0.75,-0.5,-0.25,0.25,0.5,0.75,1,1.25,1.5,1.75,2};
+	//f64 l0s[] = {-2,-1.75,-1.5,-1.25,-1,-0.75,-0.5,-0.25,0.25,0.5,0.75,1,1.25,1.5,1.75,2};
+	f64 l0s[] = {-4,-3.5,-3,-2.5};
 	//f64 l0s[] = {};
 	//i64 range_N[] = {100, 500, 15000};
 	struct nlse_settings settings = {
 		.max_iterations = 1e5,
 		.max_quadgk_iters = 500,
-		.error_tol = 1e-14,
+		.abs_error_tol = 1e-14,
 
 		.num_basis_funcs = 64,
 		.basis = ho_basis,
-		.hamiltonian_mixing = 0.5,
+		.hamiltonian_mixing = 0.7,
 
 		.zero_threshold = 1e-10,
 		.gk=gk20
@@ -95,16 +96,16 @@ int main() {
 		sbmf_init();
 
 		struct nlse_result res;
-		struct bestmf_result bmf_gaussian_res;
-		struct bestmf_result bmf_default_res;
+		f64 bmf_gaussian_res;
+		f64 bmf_default_res;
 
 		f64 g0 = l0s[j]/((f64)N-1.0);
 
 		res = grosspitaevskii(settings, component_count, &N, default_guesses, &g0);
 		f64 Egp = grosspitaevskii_energy(settings, res.coeff_count, component_count, res.coeff, &N, &g0);
 
-		bmf_gaussian_res = best_meanfield(settings, N, g0, gaussian_guesses);
-		bmf_default_res = best_meanfield(settings, N, g0, default_guesses);
+		bmf_gaussian_res = bestmf_find_fractional_occupation(settings, N, g0, gaussian_guesses);
+		bmf_default_res = bestmf_find_fractional_occupation(settings, N, g0, default_guesses);
 
 		struct pt_result rs_ptres = rspt_1comp_cuda_new(&settings, res, 0, g0, N);
 		struct pt_result en_ptres = enpt_1comp_cuda_new(&settings, res, 0, g0, N);
@@ -122,8 +123,8 @@ int main() {
 			fprintf(fd, "%.10lf\t%.10lf\t%.10f\t%.10f\t%.10lf\t%.10lf\t%.10lf\t%.10lf\n",
 					l0s[j],
 					Egp,
-					bmf_gaussian_res.energy								- Egp,
-					bmf_default_res.energy 								- Egp,
+					bmf_gaussian_res,
+					bmf_default_res,
 					rs_ptres.E0+rs_ptres.E1+rs_ptres.E2					- Egp,
 					rs_ptres.E0+rs_ptres.E1+rs_ptres.E2+rs_ptres.E3		- Egp,
 					en_ptres.E0+en_ptres.E1+en_ptres.E2					- Egp,
