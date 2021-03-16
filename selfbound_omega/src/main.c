@@ -70,7 +70,7 @@ int main() {
 		.basis = ho_basis,
 
 		.zero_threshold = 1e-10,
-		.hamiltonian_mixing = 0.5,
+		.hamiltonian_mixing = 0.7,
 
 		.orbital_choice = NLSE_ORBITAL_LOWEST_ENERGY,
 
@@ -81,7 +81,7 @@ int main() {
 
 	i64 N = 4;
 	//f64 Os[] = {1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1};
-	f64 Os[] = {0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.02, 0.01};
+	f64 Os[] = {0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.02, 0.01, 0.009, 0.008, 0.007, 0.006, 0.005, 0.004, 0.003, 0.002, 0.001};
 
 	{
 		FILE* fd = fopen("out", "a");
@@ -94,8 +94,8 @@ int main() {
 		OMEGA = Os[i];
 		i64 occupations[] = {N,N};
 		f64 g0[] = {
-			 lambda/((f64)N-1), -0.5*lambda/((f64)N-1),
-			-0.5*lambda/((f64)N-1),  lambda/((f64)N-1)
+			 lambda/((f64)N-1), -0.85*lambda/((f64)N-1),
+			-0.85*lambda/((f64)N-1),  lambda/((f64)N-1)
 		};
 
 		sbmf_init();
