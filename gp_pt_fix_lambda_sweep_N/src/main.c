@@ -83,14 +83,14 @@ int main() {
 	f64 l0s[] = {-0.5, -1.0, 1.0, 0.5};
 	//f64 l0s[] = {};
 	//i64 range_N[] = {100, 500, 15000};
-	i64 Ns[] = {4,6,10,20,30,40,60,80,100,120,140,160};
+	i64 Ns[] = {4,30,100};
 	struct nlse_settings settings = {
         //.spatial_pot_perturbation = perturbation,
 		.max_iterations = 1e5,
 		.max_quadgk_iters = 500,
 		.abs_error_tol = 1e-14,
 
-		.num_basis_funcs = 64,
+		.num_basis_funcs = 80,
 		.basis = ho_basis,
 
 		.zero_threshold = 1e-10,

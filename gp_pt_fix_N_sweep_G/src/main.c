@@ -74,15 +74,14 @@ int main() {
 
 	i64 N = 100;
 	//f64 l0s[] = {-2,-1.75,-1.5,-1.25,-1,-0.75,-0.5,-0.25,0.25,0.5,0.75,1,1.25,1.5,1.75,2};
-	f64 l0s[] = {-4.5, -5};
-	//f64 l0s[] = {};
+	f64 l0s[] = {-2,-1,1,2};
 	//i64 range_N[] = {100, 500, 15000};
 	struct nlse_settings settings = {
 		.max_iterations = 1e5,
 		.max_quadgk_iters = 500,
 		.abs_error_tol = 1e-14,
 
-		.num_basis_funcs = 64,
+		.num_basis_funcs = 80,
 		.basis = ho_basis,
 		.hamiltonian_mixing = 0.7,
 
