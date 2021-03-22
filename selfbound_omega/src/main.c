@@ -90,7 +90,7 @@ int main() {
 	}
 
 	f64 lambda = 0.5;
-	f64 factor = -0.75;
+	f64 factor = -0.85;
 	for (u32 i = 0; i < sizeof(Os)/sizeof(Os[0]); ++i) {
 		OMEGA = Os[i];
 		i64 occupations[] = {N,N};
