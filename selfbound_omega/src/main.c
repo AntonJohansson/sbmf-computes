@@ -83,14 +83,8 @@ int main() {
 	//f64 Os[] = {1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1};
 	f64 Os[] = {0.01, 0.008, 0.006, 0.004, 0.002, 0.001};
 
-	{
-		FILE* fd = fopen("out", "a");
-		fprintf(fd, "# OMEGA\tE\tRS2\tRS3\tEN2\tEN3\n");
-		fclose(fd);
-	}
-
 	f64 lambda = 0.5;
-	f64 factor = -0.85;
+	f64 factor = -0.95;
 	for (u32 i = 0; i < sizeof(Os)/sizeof(Os[0]); ++i) {
 		OMEGA = Os[i];
 		i64 occupations[] = {N,N};
