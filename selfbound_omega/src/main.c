@@ -82,66 +82,72 @@ int main() {
 	i64 N = 4;
 	//f64 Os[] = {1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1};
 	f64 Os[] = {0.01, 0.008, 0.006, 0.004, 0.002, 0.001};
+	f64 fs[] = {0.99, 1.00, 1.05, 1.10, 1.15, 1.20, 1.25};
 
 	f64 lambda = 0.5;
-	f64 factor = -0.95;
-	for (u32 i = 0; i < sizeof(Os)/sizeof(Os[0]); ++i) {
-		OMEGA = Os[i];
-		i64 occupations[] = {N,N};
-		f64 g0[] = {
-			 lambda/((f64)N-1), factor*lambda/((f64)N-1),
-			factor*lambda/((f64)N-1),  lambda/((f64)N-1)
-		};
+	for (u32 j = 0; j < sizeof(fs)/sizeof(fs[0]); ++j) {
+		f64 factor = fs[j];
 
-		sbmf_init();
-		struct nlse_result res = grosspitaevskii(settings, component_count, occupations, guesses, g0);
-		if (!res.converged)
-			break;
+		for (u32 i = 0; i < sizeof(Os)/sizeof(Os[0]); ++i) {
+			OMEGA = Os[i];
+			i64 occupations[] = {N,N};
+			f64 g0[] = {
+				lambda/((f64)N-1), factor*lambda/((f64)N-1),
+				factor*lambda/((f64)N-1),  lambda/((f64)N-1)
+			};
 
-		f64 Efull = grosspitaevskii_energy(settings, res.coeff_count, component_count, res.coeff, occupations, g0);
-		printf("\nfull energy: %lf\n", Efull);
+			sbmf_init();
+			struct nlse_result res = grosspitaevskii(settings, component_count, occupations, guesses, g0);
+			if (!res.converged)
+				break;
 
-		// out Energy
-		{
-			FILE* fd = fopen("out_E", "a");
-			fprintf(fd, "%lf\t%.10e\n",
-					OMEGA,
-					Efull
-					);
-			fclose(fd);
-		}
+			f64 Efull = grosspitaevskii_energy(settings, res.coeff_count, component_count, res.coeff, occupations, g0);
+			printf("\nfull energy: %lf\n", Efull);
 
-		// out wf
-		{
-			char buf[128];
-			snprintf(buf, 128, "out_W_w%lf", Os[i]);
-			FILE* fd = fopen(buf, "a");
-			for (f64 x = -10; x < 10; x += 0.01) {
-				  f64 outA, outB;
-				  ho_sample(res.coeff_count, &res.coeff[0], 							1, &outA, &x);
-				  ho_sample(res.coeff_count, &res.coeff[res.coeff_count], 1, &outB, &x);
-				  fprintf(fd, "%lf\t%lf\t%lf\n", x, outA*outA, outB*outB);
+			// out Energy
+			{
+				char buf[256];
+				snprintf(buf, 256, "out_f%lf_E", fs[j]);
+				FILE* fd = fopen(buf, "a");
+				fprintf(fd, "%lf\t%.10e\n",
+						OMEGA,
+						Efull
+						);
+				fclose(fd);
 			}
 
-			fclose(fd);
+			// out wf
+			{
+				char buf[256];
+				snprintf(buf, 256, "out_f%lf_W_w%lf", fs[j], Os[i]);
+				FILE* fd = fopen(buf, "a");
+				for (f64 x = -10; x < 10; x += 0.01) {
+					f64 outA, outB;
+					ho_sample(res.coeff_count, &res.coeff[0], 							1, &outA, &x);
+					ho_sample(res.coeff_count, &res.coeff[res.coeff_count], 1, &outB, &x);
+					fprintf(fd, "%lf\t%lf\t%lf\n", x, outA*outA, outB*outB);
+				}
+
+				fclose(fd);
+			}
+
+			//struct pt_result rspt = rspt_2comp_cuda_new(&settings, res, 0, 1, g0[0], g0[1], occupations[0], occupations[1]);
+			//struct pt_result enpt = enpt_2comp_cuda_new(&settings, res, 0, 1, g0[0], g0[1], occupations[0], occupations[1]);
+			//{
+			//	FILE* fd = fopen("out", "a");
+			//	fprintf(fd, "%lf\t%.10e\t%.10e\t%.10e\t%.10e\t%.10e\n",
+			//			OMEGA,
+			//			Efull,
+			//			rspt.E0+rspt.E1+rspt.E2,
+			//			rspt.E0+rspt.E1+rspt.E2+rspt.E3,
+			//			enpt.E0+enpt.E1+enpt.E2,
+			//			enpt.E0+enpt.E1+enpt.E2+enpt.E3
+			//			);
+			//	fclose(fd);
+			//}
+
+			sbmf_shutdown();
 		}
-
-		//struct pt_result rspt = rspt_2comp_cuda_new(&settings, res, 0, 1, g0[0], g0[1], occupations[0], occupations[1]);
-		//struct pt_result enpt = enpt_2comp_cuda_new(&settings, res, 0, 1, g0[0], g0[1], occupations[0], occupations[1]);
-		//{
-		//	FILE* fd = fopen("out", "a");
-		//	fprintf(fd, "%lf\t%.10e\t%.10e\t%.10e\t%.10e\t%.10e\n",
-		//			OMEGA,
-		//			Efull,
-		//			rspt.E0+rspt.E1+rspt.E2,
-		//			rspt.E0+rspt.E1+rspt.E2+rspt.E3,
-		//			enpt.E0+enpt.E1+enpt.E2,
-		//			enpt.E0+enpt.E1+enpt.E2+enpt.E3
-		//			);
-		//	fclose(fd);
-		//}
-
-		sbmf_shutdown();
 	}
 
 
