@@ -4,7 +4,7 @@
 
 #define USE_TF_GUESS 0
 #define USE_GAUSSIAN_GUESS 0
-#define USE_RANDOM_GUESS 1
+#define USE_RANDOM_GUESS 0
 
 
 
@@ -62,7 +62,7 @@ int main() {
 #endif
 
 	struct nlse_settings settings = {
-		.max_iterations = 1000,
+		.max_iterations = 2000,
 		.max_quadgk_iters = 500,
 		.abs_error_tol = 1e-14,
 
@@ -81,8 +81,8 @@ int main() {
 
 	i64 N = 4;
 	//f64 Os[] = {1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1};
-	f64 Os[] = {0.01, 0.008, 0.006, 0.004, 0.002, 0.001};
-	f64 fs[] = {0.99, 1.00, 1.05, 1.10, 1.15, 1.20, 1.25};
+	f64 Os[] = {0.005};
+	f64 fs[] = {-0.85, -0.90, -0.95, -0.99, -1.00, -1.10, -1.15};
 
 	f64 lambda = 0.5;
 	for (u32 j = 0; j < sizeof(fs)/sizeof(fs[0]); ++j) {
