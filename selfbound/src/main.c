@@ -62,7 +62,7 @@ int main() {
 #endif
 
 	struct nlse_settings settings = {
-		.max_iterations = 1e3,
+		.max_iterations = 1000,
 		.max_quadgk_iters = 500,
 		.abs_error_tol = 1e-14,
 
@@ -88,8 +88,8 @@ int main() {
 	//i64 Ns[] = {2000,3000,4000,5000,6000,7000,8000,9000,10000};
 	//f64 Os[] = {0.3, 0.2, 0.15, 0.1};
 	//f64 Os[] = {0.1, 0.05, 0.025};
-	f64 Os[] = {0.007};
-	f64 gAB_factors[] = {-0.85};
+	f64 Os[] = {0.005};
+	f64 gAB_factors[] = {-0.95, -1.0, -1.05, -1.10, -1.15};
 
 	f64 lambda = 0.5;
 	for (u32 k = 0; k < sizeof(gAB_factors)/sizeof(gAB_factors[0]); ++k) {
@@ -122,6 +122,8 @@ int main() {
 
 				sbmf_init();
 				struct nlse_result res = grosspitaevskii(settings, component_count, occupations, guesses, g0);
+				if (!res.converged)
+					break;
 				f64 Efull = grosspitaevskii_energy(settings, res.coeff_count, component_count, res.coeff, occupations, g0);
 				printf("\nfull energy: %lf\n", Efull);
 
