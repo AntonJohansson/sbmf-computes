@@ -70,7 +70,7 @@ int main() {
 		.basis = ho_basis,
 
 		.zero_threshold = 1e-10,
-		.hamiltonian_mixing = 0.9,
+		.hamiltonian_mixing = 0.7,
 
 		.orbital_choice = NLSE_ORBITAL_LOWEST_ENERGY,
 
@@ -90,7 +90,7 @@ int main() {
 	//f64 Os[] = {0.3, 0.2, 0.15, 0.1};
 	//f64 Os[] = {0.1, 0.05, 0.025};
 	f64 Os[] = {0.005};
-	f64 gAB_factors[] = {-1.5};
+	f64 gAB_factors[] = {-1.25};
 
 	f64 lambda = 1.0;
 	for (u32 k = 0; k < sizeof(gAB_factors)/sizeof(gAB_factors[0]); ++k) {
