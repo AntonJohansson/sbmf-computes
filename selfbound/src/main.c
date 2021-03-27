@@ -94,7 +94,7 @@ int main() {
 	//i64 Ns[] = {2000,3000,4000,5000,6000,7000,8000,9000,10000};
 	//f64 Os[] = {0.3, 0.2, 0.15, 0.1};
 	//f64 Os[] = {0.1, 0.05, 0.025};
-	f64 Os[] = {0.0005};
+	f64 Os[] = {0.001};
 	f64 gAB_factors[] = {-0.95};
 
 	f64 lambda = 0.25;
@@ -120,7 +120,7 @@ int main() {
 				//	 gAB_factor*lambda/((f64)N-1),  lambda/((f64)N-1)
 				//};
 
-				const i64 max_N = 500;
+				const i64 max_N = 1000;
 				const f64 g = lambda/((f64)max_N - 1.0);
 				f64 g0[] = {
 					g, 						gAB_factor*g,
