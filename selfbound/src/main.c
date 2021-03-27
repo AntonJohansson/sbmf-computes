@@ -66,11 +66,11 @@ int main() {
 		.max_quadgk_iters = 500,
 		.abs_error_tol = 1e-14,
 
-		.num_basis_funcs = 16,
+		.num_basis_funcs = 32,
 		.basis = ho_basis,
 
 		.zero_threshold = 1e-10,
-		.hamiltonian_mixing = 0.7,
+		.hamiltonian_mixing = 0.95,
 
 		.orbital_choice = NLSE_ORBITAL_LOWEST_ENERGY,
 
@@ -81,7 +81,11 @@ int main() {
 
 	const u32 component_count = 2;
 
-	i64 Ns[] = {4,6,10,15,20,40,60,80,100,120,140,160,180,200,300,400,500};
+	//i64 Ns[] = {4,10,100,200,300,400,500,600,700,800,900,1000};
+	//i64 Ns[] = {1100,1200,1300,1400,1500,1600,1700,1800,1900};
+	//i64 Ns[] = {2000,2100,2200,2300,2400,2500};
+	i64 Ns[] = {2600,2700,2800,2900,3000,3100,3200};
+	
 	//i64 Ns[] = {110};//,120,125,130,135,140,145,150,155,160,170,180,200,220,240,260,280,300};
 	//i64 Ns[] = {200,225, 250, 275, 300, 325, 350, 375, 400,425, 450,475, 500};
 	//i64 Ns[] = {200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,2000,2500,3000,3500,4000};
@@ -90,9 +94,9 @@ int main() {
 	//f64 Os[] = {0.3, 0.2, 0.15, 0.1};
 	//f64 Os[] = {0.1, 0.05, 0.025};
 	f64 Os[] = {0.005};
-	f64 gAB_factors[] = {-1.25};
+	f64 gAB_factors[] = {-1.1};
 
-	f64 lambda = 1.0;
+	f64 lambda = 0.5;
 	for (u32 k = 0; k < sizeof(gAB_factors)/sizeof(gAB_factors[0]); ++k) {
 		f64 gAB_factor = gAB_factors[k];
 
@@ -106,7 +110,6 @@ int main() {
 				fprintf(fd, "# N\tE\tRS2\tRS3\tEN2\tEN3\n");
 				fclose(fd);
 			}
-
 
 			for (u32 i = 0; i < sizeof(Ns)/sizeof(Ns[0]); ++i) {
 				i64 N = Ns[i];
