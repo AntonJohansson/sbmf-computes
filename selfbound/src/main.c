@@ -64,8 +64,8 @@ int main() {
 	struct nlse_settings settings = {
 		.max_iterations = 3000,
 		.max_quadgk_iters = 500,
-		.abs_error_tol = 1e-14,
-		//.abs_error_tol = 1e-9,
+		//.abs_error_tol = 1e-14,
+		.abs_error_tol = 1e-9,
 
 		.num_basis_funcs = 16,
 		.basis = ho_basis,
@@ -98,7 +98,7 @@ int main() {
 	f64 Os[] = {0.0040};
 	f64 gAB_factors[] = {-0.95,-1.00,-1.05};
 
-	f64 lambda = 0.25;
+	f64 lambda = 0.1;
 	for (u32 k = 0; k < sizeof(gAB_factors)/sizeof(gAB_factors[0]); ++k) {
 		f64 gAB_factor = gAB_factors[k];
 
