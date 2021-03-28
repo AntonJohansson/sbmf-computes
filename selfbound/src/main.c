@@ -4,7 +4,7 @@
 
 #define USE_TF_GUESS 0
 #define USE_GAUSSIAN_GUESS 0
-#define USE_RANDOM_GUESS 1
+#define USE_RANDOM_GUESS 0
 
 
 
@@ -64,14 +64,14 @@ int main() {
 	struct nlse_settings settings = {
 		.max_iterations = 3000,
 		.max_quadgk_iters = 500,
-		//.abs_error_tol = 1e-14,
-		.abs_error_tol = 1e-9,
+		.abs_error_tol = 1e-14,
+		//.abs_error_tol = 1e-9,
 
 		.num_basis_funcs = 16,
 		.basis = ho_basis,
 
 		.zero_threshold = 1e-10,
-		.hamiltonian_mixing = 0.98,
+		.hamiltonian_mixing = 0.95,
 
 		.orbital_choice = NLSE_ORBITAL_LOWEST_ENERGY,
 
