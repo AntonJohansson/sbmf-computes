@@ -95,10 +95,10 @@ int main() {
 	//i64 Ns[] = {2000,3000,4000,5000,6000,7000,8000,9000,10000};
 	//f64 Os[] = {0.3, 0.2, 0.15, 0.1};
 	//f64 Os[] = {0.1, 0.05, 0.025};
-	f64 Os[] = {0.0050};
+	f64 Os[] = {0.0040};
 	f64 gAB_factors[] = {-0.95,-1.00,-1.05};
 
-	f64 lambda = 0.0;
+	f64 lambda = 0.25;
 	for (u32 k = 0; k < sizeof(gAB_factors)/sizeof(gAB_factors[0]); ++k) {
 		f64 gAB_factor = gAB_factors[k];
 
