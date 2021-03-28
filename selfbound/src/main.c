@@ -62,7 +62,7 @@ int main() {
 #endif
 
 	struct nlse_settings settings = {
-		.max_iterations = 10000,
+		.max_iterations = 3000,
 		.max_quadgk_iters = 500,
 		//.abs_error_tol = 1e-14,
 		.abs_error_tol = 1e-9,
@@ -83,6 +83,7 @@ int main() {
 	const u32 component_count = 2;
 
 	i64 Ns[] = {4,10,100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,1600,1700,1800,1900,2000,2100,2200,2300,2400,2500,2600,2700,2800,2900};
+	//i64 Ns[] = {4,10,100,200,300,400,500,600,700,800,900,1000,1100,1200};
 	//i64 Ns[] = {1100,1200,1300,1400,1500,1600,1700,1800,1900};
 	//i64 Ns[] = {2000,2100,2200,2300,2400,2500};
 	//i64 Ns[] = {2600,2700,2800,2900,3000,3100,3200};
@@ -95,9 +96,9 @@ int main() {
 	//f64 Os[] = {0.3, 0.2, 0.15, 0.1};
 	//f64 Os[] = {0.1, 0.05, 0.025};
 	f64 Os[] = {0.0015};
-	f64 gAB_factors[] = {-0.95};
+	f64 gAB_factors[] = {-1.03};
 
-	f64 lambda = 0.25;
+	f64 lambda = 1.0;
 	for (u32 k = 0; k < sizeof(gAB_factors)/sizeof(gAB_factors[0]); ++k) {
 		f64 gAB_factor = gAB_factors[k];
 
@@ -115,17 +116,17 @@ int main() {
 			for (u32 i = 0; i < sizeof(Ns)/sizeof(Ns[0]); ++i) {
 				i64 N = Ns[i];
 				i64 occupations[] = {N,N};
-				f64 g0[] = {
-					 lambda/((f64)N-1), gAB_factor*lambda/((f64)N-1),
-					 gAB_factor*lambda/((f64)N-1),  lambda/((f64)N-1)
-				};
-
-				//const i64 max_N = 1000;
-				//const f64 g = lambda/((f64)max_N - 1.0);
 				//f64 g0[] = {
-				//	g, 						gAB_factor*g,
-				//	gAB_factor*g, g
+				//	 lambda/((f64)N-1), gAB_factor*lambda/((f64)N-1),
+				//	 gAB_factor*lambda/((f64)N-1),  lambda/((f64)N-1)
 				//};
+
+				const i64 max_N = 1000;
+				const f64 g = lambda/((f64)max_N - 1.0);
+				f64 g0[] = {
+					g, 						gAB_factor*g,
+					gAB_factor*g, g
+				};
 
 				sbmf_init();
 				struct nlse_result res = grosspitaevskii(settings, component_count, occupations, guesses, g0);
