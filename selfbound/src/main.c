@@ -71,7 +71,7 @@ int main() {
 		.basis = ho_basis,
 
 		.zero_threshold = 1e-10,
-		.hamiltonian_mixing = 0.975,
+		.hamiltonian_mixing = 0.98,
 
 		.orbital_choice = NLSE_ORBITAL_LOWEST_ENERGY,
 
