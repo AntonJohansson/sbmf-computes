@@ -96,7 +96,7 @@ int main() {
 	//f64 Os[] = {0.3, 0.2, 0.15, 0.1};
 	//f64 Os[] = {0.1, 0.05, 0.025};
 	f64 Os[] = {0.0020};
-	f64 gAB_factors[] = {-0.99};
+	f64 gAB_factors[] = {-0.98};
 
 	f64 lambda = 1.0;
 	for (u32 k = 0; k < sizeof(gAB_factors)/sizeof(gAB_factors[0]); ++k) {
@@ -116,17 +116,17 @@ int main() {
 			for (u32 i = 0; i < sizeof(Ns)/sizeof(Ns[0]); ++i) {
 				i64 N = Ns[i];
 				i64 occupations[] = {N,N};
-				f64 g0[] = {
-					 lambda/((f64)N-1), gAB_factor*lambda/((f64)N-1),
-					 gAB_factor*lambda/((f64)N-1),  lambda/((f64)N-1)
-				};
-
-				//const i64 max_N = 50;
-				//const f64 g = lambda/((f64)max_N - 1.0);
 				//f64 g0[] = {
-				//	g, 						gAB_factor*g,
-				//	gAB_factor*g, g
+				//	 lambda/((f64)N-1), gAB_factor*lambda/((f64)N-1),
+				//	 gAB_factor*lambda/((f64)N-1),  lambda/((f64)N-1)
 				//};
+
+				const i64 max_N = 50;
+				const f64 g = lambda/((f64)max_N - 1.0);
+				f64 g0[] = {
+					g, 						gAB_factor*g,
+					gAB_factor*g, g
+				};
 
 				sbmf_init();
 				struct nlse_result res = grosspitaevskii(settings, component_count, occupations, guesses, g0);
