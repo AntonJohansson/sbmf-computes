@@ -121,7 +121,7 @@ int main() {
 				//	 gAB_factor*lambda/((f64)N-1),  lambda/((f64)N-1)
 				//};
 
-				const i64 max_N = 50;
+				const i64 max_N = 100;
 				const f64 g = lambda/((f64)max_N - 1.0);
 				f64 g0[] = {
 					g, 						gAB_factor*g,
