@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#define PERTURBATION(x) gaussian(x, 0, 0.1)
+#define PERTURBATION(x) 2*gaussian(x, 0, 0.1)
 //#define PERTURBATION(x) (1.0/(cosh(2.0*x)*cosh(2.0*x)))
 
 void perturbation(const u32 len, f64 out[static len],
@@ -52,8 +52,8 @@ int main() {
 	const u32 component_count = 1;
 
 	f64 lambda = -1.0;
-	//i64 Ns[] = {100,105,110,115,120,125,127,130,132,135,137,140};
-	i64 Ns[] = {127,132,137};
+	i64 Ns[] = {100,105,110,115,120,125,127,130,132,135,137,140};
+	//i64 Ns[] = {127,132,137};
 	f64 gs[] = {-0.01};
 
 	for (u32 i = 0; i < sizeof(Ns)/sizeof(Ns[0]); ++i) {
