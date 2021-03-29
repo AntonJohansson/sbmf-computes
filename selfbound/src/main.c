@@ -64,8 +64,8 @@ int main() {
 	struct nlse_settings settings = {
 		.max_iterations = 3000,
 		.max_quadgk_iters = 500,
-		//.abs_error_tol = 1e-14,
-		.abs_error_tol = 1e-9,
+		.abs_error_tol = 1e-14,
+		//.abs_error_tol = 1e-9,
 
 		.num_basis_funcs = 16,
 		.basis = ho_basis,
@@ -82,7 +82,7 @@ int main() {
 
 	const u32 component_count = 2;
 
-	i64 Ns[] = {4,10,20,30,40,50,60,70,80,90,100,150,200};
+	i64 Ns[] = {4,8,10,15,20,25,30,35,40,45,50,55,60,70,80,90,100};
 	//i64 Ns[] = {4,10,100,200,300,400,500,600,700,800,900,1000,1100,1200};
 	//i64 Ns[] = {1100,1200,1300,1400,1500,1600,1700,1800,1900};
 	//i64 Ns[] = {2000,2100,2200,2300,2400,2500};
