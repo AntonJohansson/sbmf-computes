@@ -98,7 +98,7 @@ int main() {
 	f64 Os[] = {0.0050};
 	f64 gAB_factors[] = {-0.95};
 
-	f64 lambda = 1.0;
+	f64 lambda = 0.5;
 	for (u32 k = 0; k < sizeof(gAB_factors)/sizeof(gAB_factors[0]); ++k) {
 		f64 gAB_factor = gAB_factors[k];
 
