@@ -67,7 +67,7 @@ int main() {
 		.abs_error_tol = 1e-14,
 		//.abs_error_tol = 1e-9,
 
-		.num_basis_funcs = 16,
+		.num_basis_funcs = 48,
 		.basis = ho_basis,
 
 		.zero_threshold = 1e-10,
@@ -96,7 +96,7 @@ int main() {
 	//f64 Os[] = {0.3, 0.2, 0.15, 0.1};
 	//f64 Os[] = {0.1, 0.05, 0.025};
 	f64 Os[] = {0.0050};
-	f64 gAB_factors[] = {-0.90};
+	f64 gAB_factors[] = {-0.90,-0.95,-0.99};
 
 	f64 lambda = 0.5;
 	for (u32 k = 0; k < sizeof(gAB_factors)/sizeof(gAB_factors[0]); ++k) {
