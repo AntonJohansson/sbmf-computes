@@ -52,7 +52,7 @@ int main() {
 	const u32 component_count = 1;
 
 	//f64 lambda = -1.0;
-	i64 Ns[] = {65};
+	i64 Ns[] = {70,75,80,85};
 	//i64 Ns[] = {127,132,137};
 	f64 gs[] = {-0.01};
 
