@@ -33,8 +33,10 @@ int main() {
 	//f64 lambda = -1.0;
 	//f64 N  = 4;
 	//f64 g0 = lambda/((f64)N-1.0);
-	i64 Ns[] = {130};
-	f64 g0 = -0.01;
+	i64 Ns[] = {4};
+	f64 g0 = -1.0/3.0;
+	//i64 Ns[] = {130};
+	//f64 g0 = -0.01;
 
 	struct nlse_settings settings = {
         .spatial_pot_perturbation = perturbation,
