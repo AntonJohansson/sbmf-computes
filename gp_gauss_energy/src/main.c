@@ -52,7 +52,7 @@ int main() {
 	const u32 component_count = 1;
 
 	f64 lambda = -1.0;
-	i64 Ns[] = {4,10,20,30,40,50,60,70,80,90,100};
+	i64 Ns[] = {150,200};
 
 	FILE* default_fd = fopen("out_default_E", "a");
 	FILE* random_fd = fopen("out_random_E", "a");
