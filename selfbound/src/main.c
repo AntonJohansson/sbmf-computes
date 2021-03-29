@@ -67,11 +67,11 @@ int main() {
 		.abs_error_tol = 1e-14,
 		//.abs_error_tol = 1e-9,
 
-		.num_basis_funcs = 16,
+		.num_basis_funcs = 32,
 		.basis = ho_basis,
 
 		.zero_threshold = 1e-10,
-		.hamiltonian_mixing = 0.95,
+		.hamiltonian_mixing = 0.97,
 
 		.orbital_choice = NLSE_ORBITAL_LOWEST_ENERGY,
 
@@ -82,7 +82,7 @@ int main() {
 
 	const u32 component_count = 2;
 
-	i64 Ns[] = {4,8,10,15,20,25,30,35,40,45,50,55,60,70,80,90,100};
+	i64 Ns[] = {4,8,10,15,20,25,30,35,40,45,50,55,60};
 	//i64 Ns[] = {4,10,100,200,300,400,500,600,700,800,900,1000,1100,1200};
 	//i64 Ns[] = {1100,1200,1300,1400,1500,1600,1700,1800,1900};
 	//i64 Ns[] = {2000,2100,2200,2300,2400,2500};
