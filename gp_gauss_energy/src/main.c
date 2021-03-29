@@ -21,6 +21,7 @@ void log_callback(enum sbmf_log_level log_level, const char* msg) {
 
 int main() {
 	sbmf_set_log_callback(log_callback);
+	sbmf_set_thread_storage_size(128*1024*1024);
 	//OMEGA = 0.1;
 
 	struct nlse_guess random_guesses[] = {
@@ -52,7 +53,7 @@ int main() {
 	const u32 component_count = 1;
 
 	//f64 lambda = -1.0;
-	i64 Ns[] = {50,55,60,65,67,70,72,75};
+	i64 Ns[] = {67,70,72,75};
 	//i64 Ns[] = {127,132,137};
 	f64 gs[] = {-0.01};
 
@@ -60,58 +61,50 @@ int main() {
 
 		i64 N = Ns[i];
 		for (u32 j = 0; j < sizeof(gs)/sizeof(gs[0]); ++j) {
-			sbmf_init();
 			f64 g0 = gs[j];
 
-			struct nlse_result gp_default_res = grosspitaevskii(settings, component_count, &N, default_guesses, &g0);
-			struct nlse_result gp_random_res = grosspitaevskii(settings, component_count, &N, random_guesses, &g0);
-			if (!gp_default_res.converged || !gp_random_res.converged)
-				break;
+			FILE* fd = fopen("out", "a");
+			fprintf(fd, "%ld\t", N);
 
-			f64 Egp_default = grosspitaevskii_energy(settings, gp_default_res.coeff_count, component_count, gp_default_res.coeff, &N, &g0);
-			f64 Egp_random  = grosspitaevskii_energy(settings, gp_random_res.coeff_count, component_count, gp_random_res.coeff, &N, &g0);
-
-#if 1
-			f64 bmf_default=0; 
-			f64 bmf_random =0; 
-			//bmf_default = bestmf_find_fractional_occupation(settings, N, g0, default_guesses);
-			//bmf_random = bestmf_find_fractional_occupation(settings, N, g0, random_guesses);
-
-			struct pt_result rs_default_ptres = rspt_1comp_cuda_new(&settings, gp_default_res, 0, g0, N);
-			struct pt_result en_default_ptres = enpt_1comp_cuda_new(&settings, gp_default_res, 0, g0, N);
-
-			struct pt_result rs_random_ptres = rspt_1comp_cuda_new(&settings, gp_random_res, 0, g0, N);
-			struct pt_result en_random_ptres = enpt_1comp_cuda_new(&settings, gp_random_res, 0, g0, N);
-
+			sbmf_init();
 			{
-
-				//char buf[256];
-				//snprintf(buf, 256, "out_N%ld", N);
-				FILE* fd = fopen("out", "a");
-				fprintf(fd, "%ld\t%.10f\t%.10lf\t%.10lf\t%.10lf\t",
-						N,
-						Egp_default,
-						bmf_default,
-						Egp_random,
-						bmf_random
-						);
+				struct nlse_result gp_default_res = grosspitaevskii(settings, component_count, &N, default_guesses, &g0);
+				if (!gp_default_res.converged)
+					break;
+				f64 Egp_default = grosspitaevskii_energy(settings, gp_default_res.coeff_count, component_count, gp_default_res.coeff, &N, &g0);
+				f64 bmf_default = bestmf_find_fractional_occupation(settings, N, g0, default_guesses);
+				struct pt_result rs_default_ptres = rspt_1comp_cuda_new(&settings, gp_default_res, 0, g0, N);
+				struct pt_result en_default_ptres = enpt_1comp_cuda_new(&settings, gp_default_res, 0, g0, N);
+				fprintf(fd, "%.10f\t%.10lf\t", Egp_default, bmf_default);
 				fprintf(fd, "%.10lf\t%.10lf\t%.10lf\t%.10lf\t",
 						rs_default_ptres.E0 + rs_default_ptres.E1 + rs_default_ptres.E2,
 						rs_default_ptres.E0 + rs_default_ptres.E1 + rs_default_ptres.E2 + rs_default_ptres.E3,
 						en_default_ptres.E0 + en_default_ptres.E1 + en_default_ptres.E2,
 						en_default_ptres.E0 + en_default_ptres.E1 + en_default_ptres.E2 + en_default_ptres.E3
 						);
+			}
+			sbmf_shutdown();
+
+			sbmf_init();
+			{
+				struct nlse_result gp_random_res = grosspitaevskii(settings, component_count, &N, random_guesses, &g0);
+				if (!gp_random_res.converged)
+					break;
+				f64 Egp_random  = grosspitaevskii_energy(settings, gp_random_res.coeff_count, component_count, gp_random_res.coeff, &N, &g0);
+				f64 bmf_random = bestmf_find_fractional_occupation(settings, N, g0, random_guesses);
+				struct pt_result rs_random_ptres = rspt_1comp_cuda_new(&settings, gp_random_res, 0, g0, N);
+				struct pt_result en_random_ptres = enpt_1comp_cuda_new(&settings, gp_random_res, 0, g0, N);
+				fprintf(fd, "%.10f\t%.10lf\t", Egp_random, bmf_random);
 				fprintf(fd, "%.10lf\t%.10lf\t%.10lf\t%.10lf\n",
 						rs_random_ptres.E0 + rs_random_ptres.E1 + rs_random_ptres.E2,
 						rs_random_ptres.E0 + rs_random_ptres.E1 + rs_random_ptres.E2 + rs_random_ptres.E3,
 						en_random_ptres.E0 + en_random_ptres.E1 + en_random_ptres.E2,
 						en_random_ptres.E0 + en_random_ptres.E1 + en_random_ptres.E2 + en_random_ptres.E3
 						);
-				fclose(fd);
 			}
-#endif
-
 			sbmf_shutdown();
+
+			fclose(fd);
 		}
 	}
 }
