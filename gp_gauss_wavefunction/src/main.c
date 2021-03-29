@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-#define PERTURBATION(x) gaussian(x, 0, 0.2)
+#define PERTURBATION(x) 2*gaussian(x, 0, 0.2)
 
 void perturbation(const u32 len, f64 out[static len],
                                 f64 in_x[static len], const u32 component_count,
