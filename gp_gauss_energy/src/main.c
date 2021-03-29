@@ -40,7 +40,7 @@ int main() {
 		//.abs_error_tol = 1e-9,
 		.abs_error_tol = 1e-14,
 
-		.num_basis_funcs = 16,
+		.num_basis_funcs = 24,
 		.basis = ho_basis,
 		.hamiltonian_mixing = 0.75,
 
@@ -51,8 +51,8 @@ int main() {
 
 	const u32 component_count = 1;
 
-	f64 lambda = -1.0;
-	i64 Ns[] = {4,10,20,30,40,50,60,70,80,90,100,110,120,130,140};
+	//f64 lambda = -1.0;
+	i64 Ns[] = {50,55,60,65,70};
 	//i64 Ns[] = {127,132,137};
 	f64 gs[] = {-0.01};
 
