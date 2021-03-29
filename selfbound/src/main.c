@@ -116,17 +116,17 @@ int main() {
 			for (u32 i = 0; i < sizeof(Ns)/sizeof(Ns[0]); ++i) {
 				i64 N = Ns[i];
 				i64 occupations[] = {N,N};
-				//f64 g0[] = {
-				//	 lambda/((f64)N-1), gAB_factor*lambda/((f64)N-1),
-				//	 gAB_factor*lambda/((f64)N-1),  lambda/((f64)N-1)
-				//};
-
-				const i64 max_N = 50;
-				const f64 g = lambda/((f64)max_N - 1.0);
 				f64 g0[] = {
-					g, 						gAB_factor*g,
-					gAB_factor*g, g
+					 lambda/((f64)N-1), gAB_factor*lambda/((f64)N-1),
+					 gAB_factor*lambda/((f64)N-1),  lambda/((f64)N-1)
 				};
+
+				//const i64 max_N = 50;
+				//const f64 g = lambda/((f64)max_N - 1.0);
+				//f64 g0[] = {
+				//	g, 						gAB_factor*g,
+				//	gAB_factor*g, g
+				//};
 
 				sbmf_init();
 				struct nlse_result res = grosspitaevskii(settings, component_count, occupations, guesses, g0);

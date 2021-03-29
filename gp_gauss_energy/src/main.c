@@ -37,9 +37,10 @@ int main() {
         .spatial_pot_perturbation = perturbation,
 		.max_iterations = 1e5,
 		.max_quadgk_iters = 500,
-		.abs_error_tol = 1e-14,
+		.abs_error_tol = 1e-9,
+		//.abs_error_tol = 1e-14,
 
-		.num_basis_funcs = 64,
+		.num_basis_funcs = 16,
 		.basis = ho_basis,
 		.hamiltonian_mixing = 0.5,
 
@@ -51,7 +52,7 @@ int main() {
 	const u32 component_count = 1;
 
 	f64 lambda = -1.0;
-	i64 Ns[] = {4,6,8,12,16,20,24,28,32};
+	i64 Ns[] = {4,10,20,30,40,50,60,70,80,90,100};
 
 	FILE* default_fd = fopen("out_default_E", "a");
 	FILE* random_fd = fopen("out_random_E", "a");
@@ -63,7 +64,8 @@ int main() {
 		sbmf_init();
 
 		i64 N = Ns[i];
-		f64 g0 = lambda/((f64)N-1.0);
+		//f64 g0 = lambda/((f64)N-1.0);
+		f64 g0 = -0.01;
 
 		struct nlse_result gp_default_res = grosspitaevskii(settings, component_count, &N, default_guesses, &g0);
 		struct nlse_result gp_random_res = grosspitaevskii(settings, component_count, &N, random_guesses, &g0);
