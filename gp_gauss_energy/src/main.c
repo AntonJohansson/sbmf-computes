@@ -82,9 +82,9 @@ int main() {
 
 			{
 
-				char buf[256];
-				snprintf(buf, 256, "out_N%ld", N);
-				FILE* fd = fopen(buf, "a");
+				//char buf[256];
+				//snprintf(buf, 256, "out_N%ld", N);
+				FILE* fd = fopen("out", "a");
 				fprintf(fd, "%ld\t%.10f\t%.10lf\t%.10lf\t%.10lf\t",
 						N,
 						Egp_default,
