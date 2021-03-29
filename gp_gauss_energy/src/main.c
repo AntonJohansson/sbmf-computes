@@ -35,12 +35,12 @@ int main() {
 
 	struct nlse_settings settings = {
         .spatial_pot_perturbation = perturbation,
-		.max_iterations = 1000,
+		.max_iterations = 15000,
 		.max_quadgk_iters = 500,
 		//.abs_error_tol = 1e-9,
 		.abs_error_tol = 1e-14,
 
-		.num_basis_funcs = 24,
+		.num_basis_funcs = 32,
 		.basis = ho_basis,
 		.hamiltonian_mixing = 0.75,
 
@@ -52,7 +52,7 @@ int main() {
 	const u32 component_count = 1;
 
 	//f64 lambda = -1.0;
-	i64 Ns[] = {50,55,60,65,70};
+	i64 Ns[] = {65};
 	//i64 Ns[] = {127,132,137};
 	f64 gs[] = {-0.01};
 
@@ -72,8 +72,10 @@ int main() {
 			f64 Egp_random  = grosspitaevskii_energy(settings, gp_random_res.coeff_count, component_count, gp_random_res.coeff, &N, &g0);
 
 #if 1
-			f64 bmf_default = bestmf_find_fractional_occupation(settings, N, g0, default_guesses);
-			f64 bmf_random  = bestmf_find_fractional_occupation(settings, N, g0, random_guesses);
+			f64 bmf_default=0; 
+			f64 bmf_random =0; 
+			//bmf_default = bestmf_find_fractional_occupation(settings, N, g0, default_guesses);
+			//bmf_random = bestmf_find_fractional_occupation(settings, N, g0, random_guesses);
 
 			struct pt_result rs_default_ptres = rspt_1comp_cuda_new(&settings, gp_default_res, 0, g0, N);
 			struct pt_result en_default_ptres = enpt_1comp_cuda_new(&settings, gp_default_res, 0, g0, N);
