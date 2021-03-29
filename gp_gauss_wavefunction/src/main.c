@@ -31,9 +31,11 @@ int main() {
 	};
 	struct nlse_guess* default_guesses = NULL;
 
-	f64 lambda = -1.0;
-	i64 N  = 4;
-	f64 g0 = lambda/((f64)N-1.0);
+	//f64 lambda = -1.0;
+	//f64 N  = 4;
+	//f64 g0 = lambda/((f64)N-1.0);
+	i64 N = 115;
+	f64 g0 = -0.01;
 
 	struct nlse_settings settings = {
         .spatial_pot_perturbation = perturbation,
