@@ -21,7 +21,7 @@ void log_callback(enum sbmf_log_level log_level, const char* msg) {
 
 int main() {
 	sbmf_set_log_callback(log_callback);
-	sbmf_set_thread_storage_size(128*1024*1024);
+	sbmf_set_thread_storage_size(256*1024*1024);
 	//OMEGA = 0.1;
 
 	struct nlse_guess random_guesses[] = {
@@ -72,7 +72,7 @@ int main() {
 				if (!gp_default_res.converged)
 					break;
 				f64 Egp_default = grosspitaevskii_energy(settings, gp_default_res.coeff_count, component_count, gp_default_res.coeff, &N, &g0);
-				f64 bmf_default = bestmf_find_fractional_occupation(settings, N, g0, default_guesses);
+				f64 bmf_default = 0;//= bestmf_find_fractional_occupation(settings, N, g0, default_guesses);
 				struct pt_result rs_default_ptres = rspt_1comp_cuda_new(&settings, gp_default_res, 0, g0, N);
 				struct pt_result en_default_ptres = enpt_1comp_cuda_new(&settings, gp_default_res, 0, g0, N);
 				fprintf(fd, "%.10f\t%.10lf\t", Egp_default, bmf_default);
@@ -91,7 +91,7 @@ int main() {
 				if (!gp_random_res.converged)
 					break;
 				f64 Egp_random  = grosspitaevskii_energy(settings, gp_random_res.coeff_count, component_count, gp_random_res.coeff, &N, &g0);
-				f64 bmf_random = bestmf_find_fractional_occupation(settings, N, g0, random_guesses);
+				f64 bmf_random = 0;//bestmf_find_fractional_occupation(settings, N, g0, random_guesses);
 				struct pt_result rs_random_ptres = rspt_1comp_cuda_new(&settings, gp_random_res, 0, g0, N);
 				struct pt_result en_random_ptres = enpt_1comp_cuda_new(&settings, gp_random_res, 0, g0, N);
 				fprintf(fd, "%.10f\t%.10lf\t", Egp_random, bmf_random);
