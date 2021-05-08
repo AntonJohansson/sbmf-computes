@@ -63,7 +63,7 @@ int main() {
 
 	struct nlse_settings settings = {
 		.max_iterations = 3000,
-		.max_quadgk_iters = 500,
+		.max_quadgk_iters = 1000,
 		.abs_error_tol = 1e-14,
 		//.abs_error_tol = 1e-9,
 
@@ -82,13 +82,13 @@ int main() {
 
 	const u32 component_count = 2;
 
-	//i64 Ns[] = {4,8,10,15,20,25,30,35,40,45,50,55,60};
-	i64 Ns[] = {6,65,70};
+	i64 Ns[] = {4,6, 8,10,15,20,25,30,35,40,45,50,55,60,65,70};
+	//i64 Ns[] = {6,65,70};
 	//i64 Ns[] = {4,10,100,200,300,400,500,600,700,800,900,1000,1100,1200};
 	//i64 Ns[] = {1100,1200,1300,1400,1500,1600,1700,1800,1900};
 	//i64 Ns[] = {2000,2100,2200,2300,2400,2500};
 	//i64 Ns[] = {2600,2700,2800,2900,3000,3100,3200};
-	
+
 	//i64 Ns[] = {110};//,120,125,130,135,140,145,150,155,160,170,180,200,220,240,260,280,300};
 	//i64 Ns[] = {200,225, 250, 275, 300, 325, 350, 375, 400,425, 450,475, 500};
 	//i64 Ns[] = {200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,2000,2500,3000,3500,4000};
@@ -133,6 +133,16 @@ int main() {
 				struct nlse_result res = grosspitaevskii(settings, component_count, occupations, guesses, g0);
 				if (!res.converged)
 					break;
+				{
+					f64 n = 0;
+					f64 x_in = 0;
+					ho_sample(res.coeff_count, res.coeffs, 1, &n, &x_in);
+
+					FILE* fd = fopen("out_n", "a");
+					fprintf(fd, "%ld\t%.10e\n", N, n);
+					fclose(fd);
+				}
+
 				f64 Efull = grosspitaevskii_energy(settings, res.coeff_count, component_count, res.coeff, occupations, g0);
 				printf("\nfull energy: %lf\n", Efull);
 
