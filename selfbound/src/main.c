@@ -136,30 +136,31 @@ int main() {
 				{
 					f64 n = 0;
 					f64 x_in = 0;
-					ho_sample(res.coeff_count, res.coeffs, 1, &n, &x_in);
+					ho_sample(res.coeff_count, res.coeff, 1, &n, &x_in);
 
 					FILE* fd = fopen("out_n", "a");
 					fprintf(fd, "%ld\t%.10e\n", N, n);
 					fclose(fd);
 				}
 
-				f64 Efull = grosspitaevskii_energy(settings, res.coeff_count, component_count, res.coeff, occupations, g0);
-				printf("\nfull energy: %lf\n", Efull);
+				// If we wanna run pt
+				//f64 Efull = grosspitaevskii_energy(settings, res.coeff_count, component_count, res.coeff, occupations, g0);
+				//printf("\nfull energy: %lf\n", Efull);
 
-				struct pt_result rspt = rspt_2comp_cuda_new(&settings, res, 0, 1, g0[0], g0[1], occupations[0], occupations[1]);
-				struct pt_result enpt = enpt_2comp_cuda_new(&settings, res, 0, 1, g0[0], g0[1], occupations[0], occupations[1]);
-				{
-					FILE* fd = fopen(buf, "a");
-					fprintf(fd, "%ld\t%.10e\t%.10e\t%.10e\t%.10e\t%.10e\n",
-							N,
-							Efull,
-							rspt.E0+rspt.E1+rspt.E2,
-							rspt.E0+rspt.E1+rspt.E2+rspt.E3,
-							enpt.E0+enpt.E1+enpt.E2,
-							enpt.E0+enpt.E1+enpt.E2+enpt.E3
-							);
-					fclose(fd);
-				}
+				//struct pt_result rspt = rspt_2comp_cuda_new(&settings, res, 0, 1, g0[0], g0[1], occupations[0], occupations[1]);
+				//struct pt_result enpt = enpt_2comp_cuda_new(&settings, res, 0, 1, g0[0], g0[1], occupations[0], occupations[1]);
+				//{
+				//	FILE* fd = fopen(buf, "a");
+				//	fprintf(fd, "%ld\t%.10e\t%.10e\t%.10e\t%.10e\t%.10e\n",
+				//			N,
+				//			Efull,
+				//			rspt.E0+rspt.E1+rspt.E2,
+				//			rspt.E0+rspt.E1+rspt.E2+rspt.E3,
+				//			enpt.E0+enpt.E1+enpt.E2,
+				//			enpt.E0+enpt.E1+enpt.E2+enpt.E3
+				//			);
+				//	fclose(fd);
+				//}
 
 				sbmf_shutdown();
 			}
