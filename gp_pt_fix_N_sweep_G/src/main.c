@@ -73,15 +73,15 @@ int main() {
 	struct nlse_guess* default_guesses = NULL;
 
 	i64 N = 100;
-	//f64 l0s[] = {-2,-1.75,-1.5,-1.25,-1,-0.75,-0.5,-0.25,0.25,0.5,0.75,1,1.25,1.5,1.75,2};
-	f64 l0s[] = {-2,-1,1,2};
+	f64 l0s[] = {-2,-1.75,-1.5,-1.25,-1,-0.75,-0.5,-0.25,0.25,0.5,0.75,1,1.25,1.5,1.75,2};
+	//f64 l0s[] = {-2,-1,1,2};
 	//i64 range_N[] = {100, 500, 15000};
 	struct nlse_settings settings = {
 		.max_iterations = 1e5,
 		.max_quadgk_iters = 500,
 		.abs_error_tol = 1e-14,
 
-		.num_basis_funcs = 80,
+		.num_basis_funcs = 64,
 		.basis = ho_basis,
 		.hamiltonian_mixing = 0.7,
 
@@ -119,14 +119,16 @@ int main() {
 
 		{
 			FILE* fd = fopen("out", "a");
-			fprintf(fd, "%.10lf\t%.10lf\t%.10f\t%.10f\t%.10lf\t%.10lf\t%.10lf\t%.10lf\n",
+			fprintf(fd, "%.10lf\t%.10lf\t%.10f\t%.10f\t%.10f\t%.10f\t%.10lf\t%.10lf\t%.10lf\t%.10lf\n",
 					l0s[j],
 					Egp,
 					bmf_gaussian_res,
 					bmf_default_res,
-					rs_ptres.E0+rs_ptres.E1+rs_ptres.E2					- Egp,
+					rs_ptres.E0+rs_ptres.E1														- Egp,
+					rs_ptres.E0+rs_ptres.E1+rs_ptres.E2								- Egp,
 					rs_ptres.E0+rs_ptres.E1+rs_ptres.E2+rs_ptres.E3		- Egp,
-					en_ptres.E0+en_ptres.E1+en_ptres.E2					- Egp,
+					en_ptres.E0+en_ptres.E1					   								- Egp,
+					en_ptres.E0+en_ptres.E1+en_ptres.E2								- Egp,
 					en_ptres.E0+en_ptres.E1+en_ptres.E2+en_ptres.E3		- Egp
 				   );
 			fclose(fd);
