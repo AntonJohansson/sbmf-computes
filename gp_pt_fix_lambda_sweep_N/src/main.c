@@ -83,12 +83,12 @@ int main() {
 	f64 l0s[] = {-0.5, -1.0, 1.0, 0.5};
 	//f64 l0s[] = {};
 	//i64 range_N[] = {100, 500, 15000};
-	i64 Ns[] = {4,6,10,20,30,40,60,80,100,120,140,160};
+	i64 Ns[] = {4,6};
 	//i64 Ns[] = {4,30,100};
 	struct nlse_settings settings = {
         //.spatial_pot_perturbation = perturbation,
 		.max_iterations = 1e5,
-		.max_quadgk_iters = 500,
+		.max_quadgk_iters = 1000,
 		.abs_error_tol = 1e-14,
 
 		.num_basis_funcs = 64,
@@ -112,24 +112,24 @@ int main() {
 			struct nlse_result res = grosspitaevskii(settings, component_count, &N, default_guesses, &g0);
 			f64 Egp = grosspitaevskii_energy(settings, res.coeff_count, component_count, res.coeff, &N, &g0);
 
-			{
-				f64 bmf_gaussian  = bestmf_find_fractional_occupation(settings, N, g0, gaussian_guesses);
- 				f64 bmf_default   = bestmf_find_fractional_occupation(settings, N, g0, default_guesses);
- 				f64 bmf_random    = bestmf_find_fractional_occupation(settings, N, g0, random_guesses);
-				{
-					char buf[256];
-					snprintf(buf, 256, "out_bmf_l%.2lf", l0s[j]);
+			//{
+			//	f64 bmf_gaussian  = bestmf_find_fractional_occupation(settings, N, g0, gaussian_guesses);
+ 			//	f64 bmf_default   = bestmf_find_fractional_occupation(settings, N, g0, default_guesses);
+ 			//	f64 bmf_random    = bestmf_find_fractional_occupation(settings, N, g0, random_guesses);
+			//	{
+			//		char buf[256];
+			//		snprintf(buf, 256, "out_bmf_l%.2lf", l0s[j]);
 
-					FILE* fd = fopen(buf, "a");
-					fprintf(fd, "%ld\t%.10e\t%.10e\t%.10e\n",
-							N,
-							bmf_default,
-							bmf_gaussian,
-							bmf_random
-						   );
-					fclose(fd);
-				}
-			}
+			//		FILE* fd = fopen(buf, "a");
+			//		fprintf(fd, "%ld\t%.10e\t%.10e\t%.10e\n",
+			//				N,
+			//				bmf_default,
+			//				bmf_gaussian,
+			//				bmf_random
+			//			   );
+			//		fclose(fd);
+			//	}
+			//}
 
 			struct pt_result rs_ptres = rspt_1comp_cuda_new(&settings, res, 0, g0, N);
 			struct pt_result en_ptres = enpt_1comp_cuda_new(&settings, res, 0, g0, N);
@@ -147,7 +147,7 @@ int main() {
 						rs_ptres.E0+rs_ptres.E1+rs_ptres.E2+rs_ptres.E3,
 						en_ptres.E0+en_ptres.E1,
 						en_ptres.E0+en_ptres.E1+en_ptres.E2,
-						en_ptres.E0+en_ptres.E1+en_ptres.E2+en_ptres.E3	
+						en_ptres.E0+en_ptres.E1+en_ptres.E2+en_ptres.E3
 					   );
 				fclose(fd);
 			}
