@@ -67,7 +67,7 @@ int main() {
 		.abs_error_tol = 1e-14,
 		//.abs_error_tol = 1e-9,
 
-		.num_basis_funcs = 48,
+		.num_basis_funcs = 64,
 		.basis = ho_basis,
 
 		.zero_threshold = 1e-10,
@@ -82,7 +82,8 @@ int main() {
 
 	const u32 component_count = 2;
 
-	i64 Ns[] = {4,6, 8,10,15,20,25,30,35,40,45,50,55,60,65,70};
+	i64 Ns[] = {4,30,60};
+	//i64 Ns[] = {4,6, 8,10,15,20,25,30,35,40,45,50,55,60,65,70};
 	//i64 Ns[] = {6,65,70};
 	//i64 Ns[] = {4,10,100,200,300,400,500,600,700,800,900,1000,1100,1200};
 	//i64 Ns[] = {1100,1200,1300,1400,1500,1600,1700,1800,1900};
@@ -97,7 +98,7 @@ int main() {
 	//f64 Os[] = {0.3, 0.2, 0.15, 0.1};
 	//f64 Os[] = {0.1, 0.05, 0.025};
 	f64 Os[] = {0.0050};
-	f64 gAB_factors[] = {-0.90,-0.95,-0.99};
+	f64 gAB_factors[] = {-0.99};
 
 	f64 lambda = 0.5;
 	for (u32 k = 0; k < sizeof(gAB_factors)/sizeof(gAB_factors[0]); ++k) {
@@ -144,23 +145,23 @@ int main() {
 				}
 
 				// If we wanna run pt
-				//f64 Efull = grosspitaevskii_energy(settings, res.coeff_count, component_count, res.coeff, occupations, g0);
-				//printf("\nfull energy: %lf\n", Efull);
+				f64 Efull = grosspitaevskii_energy(settings, res.coeff_count, component_count, res.coeff, occupations, g0);
+				printf("\nfull energy: %lf\n", Efull);
 
-				//struct pt_result rspt = rspt_2comp_cuda_new(&settings, res, 0, 1, g0[0], g0[1], occupations[0], occupations[1]);
-				//struct pt_result enpt = enpt_2comp_cuda_new(&settings, res, 0, 1, g0[0], g0[1], occupations[0], occupations[1]);
-				//{
-				//	FILE* fd = fopen(buf, "a");
-				//	fprintf(fd, "%ld\t%.10e\t%.10e\t%.10e\t%.10e\t%.10e\n",
-				//			N,
-				//			Efull,
-				//			rspt.E0+rspt.E1+rspt.E2,
-				//			rspt.E0+rspt.E1+rspt.E2+rspt.E3,
-				//			enpt.E0+enpt.E1+enpt.E2,
-				//			enpt.E0+enpt.E1+enpt.E2+enpt.E3
-				//			);
-				//	fclose(fd);
-				//}
+				struct pt_result rspt = rspt_2comp_cuda_new(&settings, res, 0, 1, g0[0], g0[1], occupations[0], occupations[1]);
+				struct pt_result enpt = enpt_2comp_cuda_new(&settings, res, 0, 1, g0[0], g0[1], occupations[0], occupations[1]);
+				{
+					FILE* fd = fopen(buf, "a");
+					fprintf(fd, "%ld\t%.10e\t%.10e\t%.10e\t%.10e\t%.10e\n",
+							N,
+							Efull,
+							rspt.E0+rspt.E1+rspt.E2,
+							rspt.E0+rspt.E1+rspt.E2+rspt.E3,
+							enpt.E0+enpt.E1+enpt.E2,
+							enpt.E0+enpt.E1+enpt.E2+enpt.E3
+							);
+					fclose(fd);
+				}
 
 				sbmf_shutdown();
 			}
